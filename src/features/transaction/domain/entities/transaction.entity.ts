@@ -1,5 +1,5 @@
 interface ITransaction {
-  hash: string;
+  hash?: string;
   amount: number;
   notes: string;
   token: string;
@@ -10,7 +10,7 @@ interface ITransaction {
 }
 
 export class Transaction {
-  hash: string;
+  hash?: string;
   amount: number;
   notes: string;
   token: string;

@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
-import { DecrementController } from 'src/api/decrement/decrement.controller';
+import { DecrementController } from 'src/api/individual_decrement/individual_decrement.controller';
+import { QueueEmitterFeatureModule } from '../queue_emitter/queue-emitter.module';
 import { BlockchainModule } from '../shared/blockchain/infrastructure/service/blockchain.module';
 import { UserFeatureModule } from '../user/user.module';
 import { WalletsByClientsFeatureModule } from '../wallestByClients/walletsByClients.module';
@@ -13,11 +14,12 @@ import { IndividualDecrementApplicationProvider } from './application/individual
         BlockchainModule,
         UserFeatureModule,
         WalletFeatureModule,
-        WalletsByClientsFeatureModule
+        WalletsByClientsFeatureModule,
+        QueueEmitterFeatureModule
     ],
     providers: [
         IndividualDecrementApplicationProvider
     ]
 })
 
-export class DecrementFeatureModule {}
+export class DecrementFeatureModule { }

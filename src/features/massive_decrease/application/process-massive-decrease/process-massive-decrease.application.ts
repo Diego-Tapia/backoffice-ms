@@ -5,9 +5,6 @@ import { WalletTypes } from 'src/features/wallet/wallet.type';
 import { IWalletRepository } from 'src/features/wallet/infrastructure/repositories/wallet-repository.interface';
 import { IWalletsByClientsRepository } from 'src/features/wallestByClients/infrastructure/repositories/walletsByClients-repository.interface';
 import { IBalances } from 'src/features/wallet/domain/interfaces/balances.interface';
-import configs from 'src/configs/environments/configs';
-import { ConfigType } from '@nestjs/config';
-import { SQSClient, SendMessageCommand } from '@aws-sdk/client-sqs';
 import { Transaction } from 'src/features/transaction/domain/entities/transaction.entity';
 import { ETransactionTypes } from 'src/features/transaction_type/domain/enums/transaction-types.enum';
 import { UserTypes } from 'src/features/user/user.types';
@@ -26,10 +23,11 @@ import { EMassiveIncreaseStatus } from 'src/features/massive_increase/domain/enu
 import { IMassiveIncreaseRepository } from 'src/features/massive_increase/infrastructure/repositories/massive-increase-repository.interface';
 import { MassiveIncreaseTypes } from 'src/features/massive_increase/massive-increase.types';
 import { EMassiveDecreaseDetailStatus } from '../../domain/enums/massive.decrease-detail-status.enum';
-import { ITransactionTypeRepository } from 'src/features/transaction_type/infrastructure/repositories/transaction-type-repository.interfase';
-import { TransactionTypeTypes } from 'src/features/transaction_type/transaction-type.types';
 import { IBlockhainWalletServices } from 'src/features/shared/blockchain/infrastructure/service/wallet/blockchain-wallet.interface';
 import { Wallet } from 'src/features/wallet/domain/entities/wallet.entity';
+import { QueueEmitterTypes } from 'src/features/queue_emitter/queue-emitter.types';
+import { IQueueEmitterTransactionApplication } from 'src/features/queue_emitter/application/transaction/queue-emitter-transaction-app.interface';
+import { ITransactionQueueMessage } from 'src/features/queue_emitter/domain/interfaces/transaction-queue-message.interface';
 
 export class ProcessMassiveDecreaseApplication implements IProcessMassiveDecreaseApplication {
   constructor(
@@ -45,12 +43,10 @@ export class ProcessMassiveDecreaseApplication implements IProcessMassiveDecreas
     private readonly userRepository: IUserRepository,
     @Inject(UserProfileTypes.INFRASTRUCTURE.REPOSITORY)
     private readonly userProfileRepository:IUserProfileRepository,
-    @Inject(TransactionTypeTypes.INFRASTRUCTURE.REPOSITORY)
-    private readonly transactionTypeRepository: ITransactionTypeRepository,
     @Inject(BlockchainTypes.INFRASTRUCTURE.WALLET)
     private readonly blockchainWalletService: IBlockhainWalletServices,
-    @Inject(configs.KEY)
-    private readonly configService: ConfigType<typeof configs>,
+    @Inject(QueueEmitterTypes.APPLICATION.EMITTER_TRANSACTION)
+    private readonly QueueEmitterTransactionApplication: IQueueEmitterTransactionApplication
   ) {}
 
   async execute(massiveDecreaseDto: MassiveDecreaseDto, req: RequestModel) {
@@ -116,49 +112,23 @@ export class ProcessMassiveDecreaseApplication implements IProcessMassiveDecreas
           continue;
         }
 
-        const transactionType = await this.transactionTypeRepository.findOne({name: ETransactionTypes.DECREASE})
-
         const transaction = new Transaction({
-          hash: 'HASH',
           amount: detail.amount,
           notes: detail.note,
           token: massiveDecrease.tokenId,
           userId: req.admin.id,
-          transactionType: transactionType.id,
+          transactionType: ETransactionTypes.MASSIVE_DECREMENT,
           walletFrom: userWallet.id,
           walletTo: mainWallet.id,
         });
         
-        const SQSTransaction = {
+        const transactionQueueMessage: ITransactionQueueMessage = {
           ...transaction,
-          walletFromAddress: userWallet.address,
-          walletToAddress: mainWallet.address,
           massiveDecreaseId,
           detailId: detail.id
         }
 
-        // SQS
-        const config = {
-          endpoint: process.env.NODE_ENV !== 'production' ? this.configService.sqs.sqs_endpoint_url : undefined,
-          region: process.env.REGION,
-          credentials: {
-            accessKeyId: this.configService.sqs.accesKeyId,
-            secretAccessKey: this.configService.sqs.secretAccessKey,
-          },
-        };
-    
-        const sqsClient = new SQSClient(config);
-    
-        const params = {
-          MessageBody: JSON.stringify(SQSTransaction),
-          QueueUrl: this.configService.sqs.url_t,
-        };
-    
-        const run = async () => {
-          await sqsClient.send(new SendMessageCommand(params));
-        };
-
-        run();
+        this.QueueEmitterTransactionApplication.execute(transactionQueueMessage)
 
       }
  

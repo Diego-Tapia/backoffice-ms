@@ -1,8 +1,8 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/mongoose';
-import { CognitoUserAttribute,CognitoUserPool} from 'amazon-cognito-identity-js';
+import { CognitoUserAttribute, CognitoUserPool } from 'amazon-cognito-identity-js';
 import { FilterQuery, Model, UpdateQuery } from 'mongoose';
 import configs from 'src/configs/environments/configs';
 import { Register } from '../../domain/entities/user-register.entity';
@@ -16,7 +16,7 @@ export class UserRepository implements IUserRepository {
   constructor(
     @Inject(configs.KEY)
     private config: ConfigType<typeof configs>,
-    @InjectModel(UserModel.name) private readonly userModel: Model<UserModel>
+    @InjectModel(UserModel.name) private readonly userModel: Model<UserModel>,
   ) {
     this.userPool = new CognitoUserPool({
       UserPoolId: this.config.cognito_user.user_pool,
@@ -47,7 +47,7 @@ export class UserRepository implements IUserRepository {
   }
 
   public async findOne(username: string): Promise<User> {
-    const userModel = await this.userModel.findOne({ username: username }).exec();    
+    const userModel = await this.userModel.findOne({ username: username }).exec();
     return userModel ? this.toDomainEntity(userModel) : null;
   }
 
@@ -57,7 +57,7 @@ export class UserRepository implements IUserRepository {
   }
 
   public async updateQuery(id: string, updateQuery: UpdateQuery<UserModel>): Promise<User> {
-    const model = await this.userModel.findByIdAndUpdate(id, {...updateQuery}, {new: true})
+    const model = await this.userModel.findByIdAndUpdate(id, { ...updateQuery }, { new: true });
     return model ? this.toDomainEntity(model) : null;
   }
 
@@ -68,27 +68,27 @@ export class UserRepository implements IUserRepository {
 
   public async findById(id: string): Promise<User> {
     const userModel = await this.userModel.findById(id).exec();
+    if (!userModel) {
+      throw new HttpException(`User #${id} not found`, HttpStatus.NOT_FOUND);
+    }
     return this.toDomainEntity(userModel);
   }
 
   public async findAll(filter?: FilterQuery<UserModel>): Promise<User[]> {
     const UserModel = await this.userModel.find(filter).exec();
-    return UserModel.map(user => this.toDomainEntity(user));
+    return UserModel.map((user) => this.toDomainEntity(user));
   }
 
   private toDomainEntity(model: UserModel): User {
-    const { customId, username, status, _id, avatarUrl, clientId, walletId } = model;
+    const { custom_id, username, status, _id, client_id, wallet_id } = model;
     const userEntity = new User(
-      customId,
+      custom_id,
       username,
       status,
-      avatarUrl,
-      clientId.toString(),
+      client_id.toString(),
       _id.toString(),
-      walletId.toString()
+      wallet_id?.toString(),
     );
     return userEntity;
   }
-
-
 }

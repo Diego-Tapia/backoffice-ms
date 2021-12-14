@@ -7,25 +7,20 @@ import { WalletModel } from 'src/features/wallet/infrastructure/models/wallet.mo
   timestamps: true,
 })
 export class UserModel extends Document {
-
   @Prop({ required: true })
-  customId: string;
+  custom_id: string;
 
   @Prop({ required: true })
   username: string;
-
-  @Prop({ required: true })
-  avatarUrl: string;
 
   @Prop({ required: true, enum: ['ACTIVE', 'BLOCKED', 'PENDING_APPROVE', 'INACTIVE'] })
   status: string;
 
   @Prop({ type: Types.ObjectId, ref: ClientModel.name })
-  clientId: Types.ObjectId; 
+  client_id: Types.ObjectId;
 
   @Prop({ type: Types.ObjectId, ref: WalletModel.name })
-  walletId?: Types.ObjectId;
+  wallet_id?: Types.ObjectId;
 }
 
 export const UserSchema = SchemaFactory.createForClass(UserModel);
-

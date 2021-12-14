@@ -1,9 +1,8 @@
-import { Injectable, Inject } from '@nestjs/common';
-import { User } from "../../domain/entities/user.entity";
-import { IUserRepository } from "../../infrastructure/repositories/user-reposiory.interface";
-import { UserTypes } from "../../user.types";
-import { IUserGetByIdApplication } from "./user-get-by-id-app.interface";
-
+import { Injectable, Inject, HttpStatus, HttpException } from '@nestjs/common';
+import { User } from '../../domain/entities/user.entity';
+import { IUserRepository } from '../../infrastructure/repositories/user-reposiory.interface';
+import { UserTypes } from '../../user.types';
+import { IUserGetByIdApplication } from './user-get-by-id-app.interface';
 
 @Injectable()
 export class UserGetByIdApplication implements IUserGetByIdApplication {
@@ -12,7 +11,9 @@ export class UserGetByIdApplication implements IUserGetByIdApplication {
     private readonly userRepository: IUserRepository,
   ) {}
 
-  public execute (id: string): Promise<User> {
+  public async execute(id: string): Promise<User> {
+    const user = await this.userRepository.findById(id);
+
     return this.userRepository.findById(id);
   }
 }

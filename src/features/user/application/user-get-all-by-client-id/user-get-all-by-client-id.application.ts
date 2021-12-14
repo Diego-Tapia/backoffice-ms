@@ -1,4 +1,4 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, Logger } from '@nestjs/common';
 import { User } from '../../domain/entities/user.entity';
 import { UserModel } from '../../infrastructure/models/user.model';
 import { IUserRepository } from '../../infrastructure/repositories/user-reposiory.interface';
@@ -14,7 +14,8 @@ export class UsersGetAllByClientIdApplication implements IUserGetAllByClientIdAp
   ) {}
 
   public execute(req: RequestModel): Promise<User[]> {
-    const { clientId } = req.admin;
-    return this.userRepository.findAll({ clientId });
+    //El usermodel actual tiene la property "client_id" pero de antes usaba "clientId"
+    const client_id = req.admin.clientId;
+    return this.userRepository.findAll({ client_id });
   }
 }

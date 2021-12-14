@@ -6,8 +6,8 @@ import envValidations from './configs/environments/env.validations';
 import { AdminFeatureModule } from './features/admin/admin.module';
 import { AuthMiddleware } from './features/admin/infrastructure/service/middleware/admin.middleware';
 import { ApplicabilityModule } from './features/applicability/applicability.module';
-import { DecrementFeatureModule } from './features/decrement/decrement.module';
-import { IncrementFeatureModule } from './features/increment/increment.module';
+import { DecrementFeatureModule } from './features/individual_decrement/decrement.module';
+import { IncrementFeatureModule } from './features/individual_increment/increment.module';
 import { MassiveDecreaseFeatureModule } from './features/massive_decrease/massive-decrease.module';
 import { MassiveIncreaseFeatureModule } from './features/massive_increase/massive-increase.module';
 import { TokenFeatureModule } from './features/token/token.module';
@@ -34,7 +34,7 @@ import { WalletsByClientsFeatureModule } from './features/wallestByClients/walle
     WalletsByClientsFeatureModule,
     TransactionTypeFeatureModule,
     ApplicabilityModule
-    
+
   ],
 })
 export class AppModule implements NestModule {

@@ -2,9 +2,9 @@ import { forwardRef, Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { MassiveIncreaseCotroller } from 'src/api/massive_increase/massive-increase.controller';
 import { MassiveDecreaseFeatureModule } from '../massive_decrease/massive-decrease.module';
+import { QueueEmitterFeatureModule } from '../queue_emitter/queue-emitter.module';
 import { BlockchainModule } from '../shared/blockchain/infrastructure/service/blockchain.module';
 import { LibrariesModule } from '../shared/libraries/libraries.module';
-import { TransactionTypeFeatureModule } from '../transaction_type/transaction-type.module';
 import { UserFeatureModule } from '../user/user.module';
 import { UserProfileFeatureModule } from '../user_profile/user.module';
 import { WalletsByClientsFeatureModule } from '../wallestByClients/walletsByClients.module';
@@ -24,8 +24,8 @@ import { MassiveIncreaseRepositoryProvider } from './infrastructure/repositories
     WalletFeatureModule,
     UserFeatureModule,
     UserProfileFeatureModule,
-    TransactionTypeFeatureModule,
     BlockchainModule,
+    QueueEmitterFeatureModule,
     forwardRef(() => MassiveDecreaseFeatureModule),
     MongooseModule.forFeature([
       { name: MassiveIncreaseModel.name, schema: MassiveIncreaseSchema },
