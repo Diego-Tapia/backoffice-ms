@@ -20,7 +20,7 @@ export class UserProfileModel extends Document {
   cuil: number;
 
   @Prop({ required: true })
-  avatar_url: string;
+  avatarUrl: string;
 
   @Prop({ required: true })
   email: string;

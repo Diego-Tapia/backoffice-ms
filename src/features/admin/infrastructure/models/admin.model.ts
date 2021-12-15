@@ -19,8 +19,8 @@ export class AdminModel extends Document {
   @Prop({ required: true })
   cuil: number;
 
-  /* @Prop({ required: true })
-  avatar_url: string; */
+  @Prop({ required: true })
+  avatarUrl: string; 
 
   @Prop({ required: true })
   email: string;

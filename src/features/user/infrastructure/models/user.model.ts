@@ -8,7 +8,7 @@ import { WalletModel } from 'src/features/wallet/infrastructure/models/wallet.mo
 })
 export class UserModel extends Document {
   @Prop({ required: true })
-  custom_id: string;
+  customId: string;
 
   @Prop({ required: true })
   username: string;
@@ -17,10 +17,10 @@ export class UserModel extends Document {
   status: string;
 
   @Prop({ type: Types.ObjectId, ref: ClientModel.name })
-  client_id: Types.ObjectId;
+  clientId: Types.ObjectId;
 
   @Prop({ type: Types.ObjectId, ref: WalletModel.name })
-  wallet_id?: Types.ObjectId;
+  walletId?: Types.ObjectId;
 }
 
 export const UserSchema = SchemaFactory.createForClass(UserModel);

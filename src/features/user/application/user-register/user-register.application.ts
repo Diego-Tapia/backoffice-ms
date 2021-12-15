@@ -43,9 +43,7 @@ export class UserRegisterApplication implements IUserRegisterApplication {
         username,
         "ACTIVE",
         clientId,
-        avatarUrl,
-
-      )
+     )
       const userSaved = await this.userRepository.create(user)
       
       const userProfile = new UserProfile(
