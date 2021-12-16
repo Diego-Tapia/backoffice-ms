@@ -11,9 +11,14 @@ import { WalletsByClientsFeatureModule } from '../wallestByClients/walletsByClie
 import { WalletFeatureModule } from '../wallet/wallet.module';
 import { CancelMassiveIncreaseApplicationProvider } from './application/cancel-massive-increase/cancel-massive-increase.provider';
 import { CreateMassiveIncreaseApplicationProvider } from './application/create-massive-increase/create-massive-increase.provider';
+import { GetAllMassiveIncreaseApplicationProvider } from './application/get-all-massive-increase/get-all-massive-increase.provider';
+import { GetByIdMassiveIncreaseApplicationProvider } from './application/get-by-id-massive-increase/get-by-id-massive-increase.provider';
 import { ProcessMassiveIncreaseApplicationProvider } from './application/process-massive-increase/process-massive-increase.provider';
 import { ValidateMassiveIncreaseApplicationProvider } from './application/validate-massive-increase/validate-massive-increase.provider';
-import { MassiveIncreaseModel, MassiveIncreaseSchema } from './infrastructure/models/massive-increase.model';
+import {
+  MassiveIncreaseModel,
+  MassiveIncreaseSchema,
+} from './infrastructure/models/massive-increase.model';
 import { MassiveIncreaseRepositoryProvider } from './infrastructure/repositories/massive-increase-repository.provider';
 
 @Module({
@@ -27,19 +32,17 @@ import { MassiveIncreaseRepositoryProvider } from './infrastructure/repositories
     BlockchainModule,
     QueueEmitterFeatureModule,
     forwardRef(() => MassiveDecreaseFeatureModule),
-    MongooseModule.forFeature([
-      { name: MassiveIncreaseModel.name, schema: MassiveIncreaseSchema },
-    ]),
+    MongooseModule.forFeature([{ name: MassiveIncreaseModel.name, schema: MassiveIncreaseSchema }]),
   ],
   providers: [
     CreateMassiveIncreaseApplicationProvider,
     ValidateMassiveIncreaseApplicationProvider,
     ProcessMassiveIncreaseApplicationProvider,
     CancelMassiveIncreaseApplicationProvider,
+    GetAllMassiveIncreaseApplicationProvider,
+    GetByIdMassiveIncreaseApplicationProvider,
     MassiveIncreaseRepositoryProvider,
   ],
-  exports: [
-    MassiveIncreaseRepositoryProvider
-  ]
+  exports: [MassiveIncreaseRepositoryProvider],
 })
 export class MassiveIncreaseFeatureModule {}
