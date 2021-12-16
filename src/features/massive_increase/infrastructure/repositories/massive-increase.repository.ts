@@ -74,3 +74,4 @@ export class MassiveIncreaseRepository implements IMassiveIncreaseRepository {
     return massiveIncreaseEntity;
   }
 }
+
