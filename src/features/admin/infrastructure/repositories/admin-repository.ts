@@ -119,18 +119,19 @@ export class AdminRepository implements IAdminRepository {
 
 
   private  toDomainEntity(model: AdminModel): Admin{
-    const { shortName,lastName,dni,cuil,email,clientId,phoneNumber,username, _id } = model;
-    const adminEntity = new Admin(
+    const { shortName, lastName, dni, cuil, email, clientId, phoneNumber, username, _id, avatarUrl } = model;
+    const adminEntity = new Admin({
         shortName,
         lastName,
         dni,
         cuil,
         email,
         phoneNumber,
-        clientId.toString(),
+        clientId: clientId.toString(),
         username,
-        _id.toString()
-    );
+        avatarUrl,
+        id: _id.toString()
+    });
     return  adminEntity;
   }
 

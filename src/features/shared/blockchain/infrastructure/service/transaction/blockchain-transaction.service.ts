@@ -20,7 +20,7 @@ export class BlockchainTransactionService implements IBlockchainTransactionServi
 
   async create(transaction:Transaction): Promise<Transaction> {
     try {     
-      const {data} = await this.axios.post(`${this.BLOCKCHAIN_URL}/transaction`, transaction)
+      const { data } = await this.axios.post(`${this.BLOCKCHAIN_URL}/transaction`, transaction)
       return data
     } catch (error) {
       throw new AxiosException(error)

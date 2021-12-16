@@ -10,6 +10,7 @@ import {
   IsArray,
   Min,
   IsMongoId,
+  IsBoolean,
 } from 'class-validator';
 export class CreateTokenDto {
 
@@ -47,6 +48,20 @@ export class CreateTokenDto {
   @IsOptional()
   @IsString()
   public readonly description: string;
+
+  @IsBoolean()
+  @IsNotEmpty()
+  transferable: boolean;
+
+  @IsNumber()
+  @IsPositive()
+  @Min(1)
+  @IsNotEmpty()
+  initialAmount: number;
+
+  @IsString()
+  @IsOptional()
+  observation: string
 
   @IsOptional()
   @IsDateString()

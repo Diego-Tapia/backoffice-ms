@@ -15,7 +15,6 @@ export class UpdateTokenApplication implements IUpdateTokenApplication {
   public async execute(id: string, updateTokenDto: UpdateTokenDto, req: RequestModel) {
     const { shortName, symbol } = updateTokenDto;
     const { clientId } = req.admin;
-
     const validateUniqueValues = ( shortName || symbol ) 
       ? await this.validateUniqueValuesByClientId(clientId, updateTokenDto)
       : null;

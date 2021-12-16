@@ -10,6 +10,8 @@ import {InjectConnection} from '@nestjs/mongoose';
 import * as mongoose from 'mongoose';
 import { IUserProfileRepository } from 'src/features/user_profile/infrastructure/repositories/user-repository.interface';
 import { UserProfile } from 'src/features/user_profile/domain/entities/userProfile.entity';
+import { WalletTypes } from 'src/features/wallet/wallet.type';
+import { IWalletRepository } from 'src/features/wallet/infrastructure/repositories/wallet-repository.interface';
 
 
 @Injectable()
@@ -19,6 +21,8 @@ export class UserRegisterApplication implements IUserRegisterApplication {
     private readonly userRepository: IUserRepository,
     @Inject(UserProfileTypes.INFRASTRUCTURE.REPOSITORY)
     private readonly userProfileRepository: IUserProfileRepository,
+    @Inject(WalletTypes.INFRASTRUCTURE.REPOSITORY)
+    private readonly walletRepository: IWalletRepository
 
   ) { }
 
@@ -36,17 +40,25 @@ export class UserRegisterApplication implements IUserRegisterApplication {
 
     if (userExists === null) {
       const userRegister = new Register(username, email, password);
+      // TODO: CREAR LA WALLET DESDE BLOCKCHAIN - CREAR SERVICIO PARA CONSUMIR BLOCKCHAIN-MS Y CREAR LA WALLET
+      const wallet = await this.walletRepository.create({
+        address: 'address_1',
+        privateKey: 'privateKey_1'
+      })
+
       await this.userRepository.register(userRegister);
      
-      const user = new User(
+      const user = new User({
         customId,
         username,
-        "ACTIVE",
+        status: "ACTIVE",
         clientId,
-     )
+        walletId: wallet.id          
+      })
+
       const userSaved = await this.userRepository.create(user)
       
-      const userProfile = new UserProfile(
+      const userProfile = new UserProfile({
         shortName,
         lastName,
         dni,
@@ -54,8 +66,9 @@ export class UserRegisterApplication implements IUserRegisterApplication {
         email,
         avatarUrl,
         phoneNumber,
-        userSaved._id
-      );
+        userId: userSaved.id
+      });
+      
       await this.userProfileRepository.create(userProfile); 
 
     }

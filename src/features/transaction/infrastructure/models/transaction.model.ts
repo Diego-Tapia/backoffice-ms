@@ -13,14 +13,11 @@ export class TransactionModel extends Document {
   @Prop({ required: true })
   hash: string;
 
-  @Prop({
-    requeired: true, 
-    type: Types.ObjectId, ref: TransactionTypeModel.name 
-  })
-  transactionTypeId: Types.ObjectId[];
+  @Prop({ type: Types.ObjectId, ref: TransactionTypeModel.name})
+  transactionTypeId: Types.ObjectId;
 
   @Prop({ type: Types.ObjectId, ref: TokenModel.name})
-  tokenId:  Types.ObjectId;
+  tokenId: Types.ObjectId;
 
   @Prop({ type: Types.ObjectId, ref: WalletModel.name})
   walletFromId: Types.ObjectId;
@@ -34,7 +31,7 @@ export class TransactionModel extends Document {
   @Prop({ type: Types.ObjectId, ref: UserModel.name })
   userId: Types.ObjectId;
 
-  @Prop({ required: true })
+  @Prop({ })
   notes: string;
 }
 

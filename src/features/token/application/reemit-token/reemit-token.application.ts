@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { BlockchainTypes } from 'src/features/shared/blockchain/infrastructure/service/blockchain.types';
 import { IBlockchainTokenService } from 'src/features/shared/blockchain/infrastructure/service/token/blockchain-token-service.interface';
 import { IBlockchainTransactionService } from 'src/features/shared/blockchain/infrastructure/service/transaction/blockchain-transaction-service.interface';
-import { TokenStatus } from 'src/features/shared/interfaces/token-status.interface';
+import { ETokenStatus } from 'src/features/token/domain/enums/token-status.enum';
 import { ETransactionTypes } from 'src/features/transaction_type/domain/enums/transaction-types.enum';
 import { Transaction } from 'src/features/transaction/domain/entities/transaction.entity';
 
@@ -29,7 +29,7 @@ export class ReemitTokenApplication implements IReemitTokenApplication {
 
     if (!token) throw new HttpException('No existe un activo digital con ese id', HttpStatus.NOT_FOUND);
     if (!token.emited) throw new HttpException('Este activo digital NO fue emitido por primera vez', HttpStatus.FORBIDDEN);
-    if (token.status === TokenStatus.INACTIVE) throw new HttpException('El estado del activo digital es INACTIVO', HttpStatus.FORBIDDEN);
+    if (token.status === ETokenStatus.INACTIVE) throw new HttpException('El estado del activo digital es INACTIVO', HttpStatus.FORBIDDEN);
 
     await this.blockchainTokenService.emitToken(+token.bcItemId, token.price)
 
@@ -38,7 +38,7 @@ export class ReemitTokenApplication implements IReemitTokenApplication {
       amount: reemitTokenDto.amount,
       notes: `Reemisión: ${token.shortName}`,
       token: token.id,
-      userId: null,
+      user: null,
       transactionType: ETransactionTypes.RE_EMISION,
       walletFrom: 'BLOCKCHAIN',
       walletTo: 'BILLETERA-MADRE' 

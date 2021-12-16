@@ -48,7 +48,7 @@ export class IndividualIncrementApplication implements IIndividualIncrementAppli
     if (!user) throw new HttpException('USER NOT-FOUND', HttpStatus.NOT_FOUND);
     if (!user.walletId) {
       this.userWallet = await this.blockchainWalletService.create();
-      this.userRepository.updateQuery(user._id, { walletId: this.userWallet.id });
+      this.userRepository.updateQuery(user.id, { walletId: this.userWallet.id });
     }
     else this.userWallet = await this.walletRepository.findById(user.walletId);
 
@@ -67,11 +67,10 @@ export class IndividualIncrementApplication implements IIndividualIncrementAppli
     if (this.total < individualIncrementDto.amount) throw new HttpException('THE MAIN WALLET HAS INSUFFICIENT FUNDS', HttpStatus.FORBIDDEN);
 
     const transaction = new Transaction({
-      hash: 'HASH',
       amount: individualIncrementDto.amount,
       notes: individualIncrementDto.notes,
       token: individualIncrementDto.tokenId,
-      userId: request.admin.id,
+      user: request.admin.id,
       transactionType: ETransactionTypes.INDIVIDUAL_INCREMENT,
       walletFrom: this.mainWallet.id,
       walletTo: this.userWallet.id
@@ -80,7 +79,8 @@ export class IndividualIncrementApplication implements IIndividualIncrementAppli
     //SQS
     const SQSTransaction = {
       ...transaction,
-      tokenId: transaction.token
+      tokenId: transaction.token,
+      userId: transaction.user
     }
 
     this.QueueEmitterTransactionApplication.execute(SQSTransaction)

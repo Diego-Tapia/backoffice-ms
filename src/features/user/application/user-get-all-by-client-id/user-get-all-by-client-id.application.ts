@@ -14,8 +14,7 @@ export class UsersGetAllByClientIdApplication implements IUserGetAllByClientIdAp
   ) {}
 
   public execute(req: RequestModel): Promise<User[]> {
-    //El usermodel actual tiene la property "client_id" pero de antes usaba "clientId"
-    const clientId = req.admin.clientId;
+    const { clientId } = req.admin;
     return this.userRepository.findAll({ clientId });
   }
 }

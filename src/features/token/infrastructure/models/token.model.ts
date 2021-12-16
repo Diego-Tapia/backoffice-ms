@@ -3,6 +3,7 @@ import { Document, Types } from 'mongoose';
 import { ApplicabilityModel } from 'src/features/applicability/infrastructure/models/applicability.model';
 import { ClientModel } from 'src/features/client/infrastructure/models/client.model';
 import { TransactionTypeModel } from 'src/features/transaction_type/infrastructure/models/transaction-type.model';
+import { ETokenStatus } from '../../domain/enums/token-status.enum';
 
 @Schema({
   timestamps: true,
@@ -20,7 +21,7 @@ export class TokenModel extends Document {
   @Prop({ required: true, maxlength: 5 })
   money: string;
 
-  @Prop({ required: true, enum: ['ACTIVE', 'BLOCKED', 'PENDING_APPROVE', 'INACTIVE'] })
+  @Prop({ required: true, enum: ETokenStatus })
   status: string;
 
   @Prop({ required: true, min: 0 })
@@ -45,7 +46,16 @@ export class TokenModel extends Document {
   clientId: Types.ObjectId;
 
   @Prop({ required: true, default: false })
-  emited: boolean
+  emited: boolean;
+
+  @Prop({ required: true })
+  transferable: boolean;
+
+  @Prop({ required: true })
+  initialAmount: number;
+
+  @Prop()
+  observation: string;
   
   @Prop({})
   createdAt: Date;

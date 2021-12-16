@@ -1,6 +1,6 @@
 import { Injectable, Inject, HttpException, HttpStatus, BadRequestException } from '@nestjs/common';
 import { RequestModel } from 'src/features/admin/infrastructure/service/middleware/admin.middleware';
-import { TokenStatus } from 'src/features/shared/interfaces/token-status.interface';
+import { ETokenStatus } from 'src/features/token/domain/enums/token-status.enum';
 import { Token } from '../../domain/entities/token.entity';
 import { CreateTokenDto } from '../../infrastructure/dtos/create-token.dto';
 import { ITokenRepository } from '../../infrastructure/repositories/token-repository.interface';
@@ -16,7 +16,6 @@ export class CreateTokenApplication implements ICreateTokenApplication {
 
   public async execute(createTokenDto: CreateTokenDto, req: RequestModel): Promise<Token> {
     const { clientId } = req.admin;
-    
     const validateUniqueValues = await this.validateUniqueValuesByClientId(clientId, createTokenDto);
     if(validateUniqueValues) throw new BadRequestException(validateUniqueValues)
     
@@ -26,7 +25,7 @@ export class CreateTokenApplication implements ICreateTokenApplication {
         ...createTokenDto,
         bcItemId,
         emited: false,
-        status: TokenStatus.INACTIVE,
+        status: ETokenStatus.INACTIVE,
         clientId,
       })
       return this.tokenRepository.create(token)

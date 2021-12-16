@@ -5,6 +5,7 @@ import configs from "src/configs/environments/configs";
 import { LibrariesTypes } from "src/features/shared/libraries/libraries.types";
 import { Wallet } from "src/features/wallet/domain/entities/wallet.entity";
 import { IBalances } from "src/features/wallet/domain/interfaces/balances.interface";
+import { AxiosException } from "../errors/axios.exception";
 import { IBlockhainWalletServices } from "./blockchain-wallet.interface";
 
 
@@ -27,13 +28,14 @@ export class BlockchainWalletService implements IBlockhainWalletServices{
       return response.data ? response.data : null;
     } catch (error) {
       console.log("Error creating wallet blockchain-service",error.message)
+      throw new AxiosException(error)
     }
   }
 
   async findOne(wallet_id: string): Promise<Wallet>{    
     try { 
-      // const response = await this.axios.get(`${this.BLOCKCHAIN_URL}/wallet/${wallet_id}`)
-      // return response ? response.data : null;
+      const response = await this.axios.get(`${this.BLOCKCHAIN_URL}/wallet/${wallet_id}`)
+      return response ? response.data : null;
       return {
         address: "testUserAddress",
         privateKey: "testPK",
@@ -44,6 +46,7 @@ export class BlockchainWalletService implements IBlockhainWalletServices{
       }
     } catch (error) {
       console.log("Error finding wallet blockchain-service",error.message)
+      throw new AxiosException(error)
     }
   }
 }

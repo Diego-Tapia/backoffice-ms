@@ -10,7 +10,7 @@ import {
 export class CreateUserProfileDto {
   @IsMongoId()
   @IsNotEmpty()
-  user_id: string;
+  userId: string;
   
   @IsString()
   @IsNotEmpty()

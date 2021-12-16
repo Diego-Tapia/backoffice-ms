@@ -20,7 +20,7 @@ export class AdminModel extends Document {
   cuil: number;
 
   @Prop({ required: true })
-  avatarUrl: string; 
+  avatarUrl: string;
 
   @Prop({ required: true })
   email: string;

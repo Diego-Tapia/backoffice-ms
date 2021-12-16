@@ -1,41 +1,45 @@
 interface ITransaction {
-  hash?: string;
-  amount: number;
-  notes: string;
+  transactionType: string;
   token: string;
-  userId: string;
-  transactionType: string; 
   walletFrom: string;
   walletTo: string;
+  amount: number;
+  user: string;
+  notes?: string;
+  id?: string;
+  hash?: string;
 }
 
 export class Transaction {
-  hash?: string;
-  amount: number;
-  notes: string;
+  transactionType: string;
   token: string;
-  userId: string;
-  transactionType: string; 
   walletFrom: string;
   walletTo: string;
+  amount: number;
+  user: string;
+  notes?: string;
+  hash?: string;
+  id?: string;
 
-  constructor({ 
-    hash,
-    amount,
-    notes,
-    token,
-    userId,
+  constructor({
     transactionType,
+    token,
     walletFrom,
-    walletTo}: ITransaction
-  ) {
-    this.hash = hash;
-    this.amount = amount; 
-    this.notes = notes;
+    walletTo,
+    amount,
+    user,
+    notes,
+    hash,
+    id,
+  }: ITransaction) {
+    this.transactionType = transactionType;
     this.token = token;
-    this.userId = userId;
-    this.transactionType = transactionType; 
     this.walletFrom = walletFrom;
     this.walletTo = walletTo;
+    this.amount = amount;
+    this.user = user;
+    this.notes = notes;
+    this.hash = hash;
+    this.id = id;
   }
 }
