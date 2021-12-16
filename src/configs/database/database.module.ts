@@ -10,8 +10,8 @@ import configs from '../environments/configs';
     MongooseModule.forRootAsync({
       useFactory: (configService: ConfigType<typeof configs>) => {
         return {
-          uri: configService.database.uri,
-        };
+          uri: configService.database.uri
+        }
       },
       inject: [configs.KEY],
     }),

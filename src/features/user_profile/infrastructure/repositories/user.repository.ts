@@ -41,7 +41,7 @@ export class UserRepository implements IUserProfileRepository {
 
   private toDomainEntity(model: UserProfileModel):UserProfile{
     const { shortName, lastName, dni, cuil, avatarUrl, email, phoneNumber, userId } = model;
-    const userEntity = new UserProfile(
+    const userEntity = new UserProfile({
       shortName,
       lastName,
       dni,
@@ -49,8 +49,8 @@ export class UserRepository implements IUserProfileRepository {
       avatarUrl,
       email,
       phoneNumber,
-      userId.toString(),
-    );
+      userId: userId.toString(),
+    });
     return userEntity;
   }
 }

@@ -80,15 +80,15 @@ export class UserRepository implements IUserRepository {
   }
 
   private toDomainEntity(model: UserModel): User {
-    const { customId, username,status, _id, clientId, walletId } = model;
-    const userEntity = new User(
+    const { customId, username, status, _id, clientId, walletId } = model;
+    const userEntity = new User({
       customId,
       username,
       status,
-      clientId.toString(),
-      _id,
-      "61ba4162001a7cc975e8d960" //id mongo de una wallet hardcodea, si se quita rompe todo el codigo
-    );
+      clientId: clientId.toString(),
+      id: _id.toString(),
+      walletId: walletId.toString(),
+    });
     return userEntity;
   }
 }

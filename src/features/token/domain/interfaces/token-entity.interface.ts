@@ -12,9 +12,12 @@ export interface ITokenProps {
   operations?: TransactionType[] | string[];
   applicabilities?: Applicabilities[] | string[];
   clientId: string;
+  initialAmount: number;
+  transferable: boolean;
   description?: string;
   validFrom?: Date;
   validTo?: Date;
+  observation?: string;
   id?: string;
   createdAt?: Date;
   updatedAt?: Date;

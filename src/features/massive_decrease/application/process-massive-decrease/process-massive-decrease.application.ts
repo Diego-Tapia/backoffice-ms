@@ -93,7 +93,7 @@ export class ProcessMassiveDecreaseApplication implements IProcessMassiveDecreas
         let userWallet: Wallet;
         if(!user.walletId){
           userWallet = await this.blockchainWalletService.create();
-          await this.userRepository.updateQuery(user._id, { walletId: userWallet.id });
+          await this.userRepository.updateQuery(user.id, { walletId: userWallet.id });
         }else{
           userWallet = await this.walletRepository.findById(user.walletId);
         }
@@ -116,7 +116,7 @@ export class ProcessMassiveDecreaseApplication implements IProcessMassiveDecreas
           amount: detail.amount,
           notes: detail.note,
           token: massiveDecrease.tokenId,
-          userId: req.admin.id,
+          user: req.admin.id,
           transactionType: ETransactionTypes.MASSIVE_DECREMENT,
           walletFrom: userWallet.id,
           walletTo: mainWallet.id,
@@ -124,6 +124,8 @@ export class ProcessMassiveDecreaseApplication implements IProcessMassiveDecreas
         
         const transactionQueueMessage: ITransactionQueueMessage = {
           ...transaction,
+          userId: transaction.user,
+          tokenId: transaction.token,
           massiveDecreaseId,
           detailId: detail.id
         }

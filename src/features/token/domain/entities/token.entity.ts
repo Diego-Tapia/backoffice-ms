@@ -16,6 +16,9 @@ export class Token {
   description?: string;
   validFrom?: Date;
   validTo?: Date;
+  initialAmount: number;
+  transferable: boolean;
+  observation?: string;
   id?: string;
   createdAt?: Date;
   updatedAt?: Date;
@@ -35,8 +38,12 @@ export class Token {
     description,
     validFrom,
     validTo,
+    initialAmount,
+    transferable,
+    observation,
     createdAt,
-    updatedAt}: ITokenProps
+    updatedAt,
+  }: ITokenProps
   ) {
     this.shortName = shortName;
     this.symbol = symbol;
@@ -54,5 +61,8 @@ export class Token {
     this.id = id;
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
+    this.initialAmount = initialAmount;
+    this.transferable = transferable;
+    this.observation = observation;
   }
 }

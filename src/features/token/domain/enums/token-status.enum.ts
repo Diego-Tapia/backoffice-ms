@@ -1,4 +1,4 @@
-export enum TokenStatus {
+export enum ETokenStatus {
   PENDING_APPROVE = 'PENDING_APPROVE',
   ACTIVE = 'ACTIVE',
   INACTIVE = 'INACTIVE',

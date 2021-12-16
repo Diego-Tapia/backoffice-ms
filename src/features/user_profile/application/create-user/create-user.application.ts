@@ -13,10 +13,7 @@ export class CreateUserApplication implements ICreateUserApplication {
   ) { }
 
   public execute(createUserDto: CreateUserProfileDto): Promise<UserProfile> {
-    
-    const { user_id, dni, shortName, lastName, cuil, avatarUrl, email, phoneNumber } = createUserDto;
-    const user = new UserProfile(shortName, lastName, dni, cuil, avatarUrl, email, phoneNumber,user_id);
-
+    const user = new UserProfile({...createUserDto});
     return this.userRepository.create(user);
   }
 }

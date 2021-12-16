@@ -28,15 +28,8 @@ export class MassiveIncreaseRepository implements IMassiveIncreaseRepository {
     return model ? this.toEntity(model) : null;
   }
 
-  public async update(
-    id: string,
-    updateQuery: UpdateQuery<MassiveIncreaseModel>,
-  ): Promise<MassiveIncrease> {
-    const model = await this.massiveIncreaseModel.findByIdAndUpdate(
-      id,
-      { ...updateQuery },
-      { new: true },
-    );
+  public async update(id: string, updateQuery: UpdateQuery<MassiveIncreaseModel> ): Promise<MassiveIncrease> {
+    const model = await this.massiveIncreaseModel.findByIdAndUpdate(id, { ...updateQuery }, { new: true });
     return model ? this.toEntity(model) : null;
   }
 

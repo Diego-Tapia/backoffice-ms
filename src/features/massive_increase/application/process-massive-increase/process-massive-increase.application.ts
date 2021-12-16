@@ -102,7 +102,7 @@ export class ProcessMassiveIncreaseApplication implements IProcessMassiveIncreas
         let userWallet: Wallet;
         if(!user.walletId){
           userWallet = await this.blockchainWalletService.create();
-          await this.userRepository.updateQuery(user._id, { walletId: userWallet.id });
+          await this.userRepository.updateQuery(user.id, { walletId: userWallet.id });
         }else{
           userWallet = await this.walletRepository.findById(user.walletId);
         }
@@ -111,7 +111,7 @@ export class ProcessMassiveIncreaseApplication implements IProcessMassiveIncreas
           amount: detail.amount,
           notes: detail.note,
           token: massiveIncrease.tokenId,
-          userId: req.admin.id,
+          user: req.admin.id,
           transactionType: ETransactionTypes.MASSIVE_INCREMENT,
           walletFrom: mainWallet.id,
           walletTo: userWallet.id,
@@ -119,6 +119,8 @@ export class ProcessMassiveIncreaseApplication implements IProcessMassiveIncreas
 
         const transactionQueueMessage: ITransactionQueueMessage = {
           ...transaction,
+          userId: transaction.user,
+          tokenId: transaction.token,
           massiveIncreaseId,
           detailId: detail.id
         }

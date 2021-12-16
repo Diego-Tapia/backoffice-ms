@@ -62,7 +62,7 @@ export class IndividualDecrementApplication implements IIndividualDecrementAppli
       amount: individualDecrementDto.amount,
       notes: individualDecrementDto.notes,
       token: individualDecrementDto.tokenId,
-      userId: request.admin.id,
+      user: request.admin.id,
       transactionType: ETransactionTypes.INDIVIDUAL_DECREMENT,
       walletFrom: this.userWallet.id,
       walletTo: this.mainWallet.id
@@ -71,7 +71,8 @@ export class IndividualDecrementApplication implements IIndividualDecrementAppli
     //SQS
     const SQSTransaction = {
       ...transaction,
-      tokenId: transaction.token
+      tokenId: transaction.token,
+      userId: transaction.user
     }
 
     this.QueueEmitterTransactionApplication.execute(SQSTransaction)

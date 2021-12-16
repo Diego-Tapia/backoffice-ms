@@ -9,9 +9,11 @@ import { UserRegistrerProvider } from './application/user-register/user-register
 import { UserModel, UserSchema } from './infrastructure/models/user.model';
 import { UserRepositoryProvider } from './infrastructure/repositories/user-repository.provider';
 import { UserGetAllByClientIdProvider } from './application/user-get-all-by-client-id/user-get-all-by-client-id.provider';
+import { WalletFeatureModule } from '../wallet/wallet.module';
 
 @Module({
   imports: [
+    WalletFeatureModule,
     MongooseModule.forFeature([{ name: UserModel.name, schema: UserSchema },{ name: UserProfileModel.name, schema: UserProfileSchema }]),
   ],
   providers: [

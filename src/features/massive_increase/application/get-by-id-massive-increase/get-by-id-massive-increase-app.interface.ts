@@ -2,5 +2,5 @@ import { RequestModel } from 'src/features/admin/infrastructure/service/middlewa
 import { MassiveIncrease } from '../../domain/entities/massive-increase.entity';
 
 export interface IGetByIdMassiveIncreaseApp {
-  execute(req: RequestModel): Promise<MassiveIncrease>;
+  execute(id: string): Promise<MassiveIncrease>;
 }

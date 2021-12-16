@@ -15,7 +15,7 @@ export class AdminRegisterApplication implements IAdminRegisterApplication {
     ) { }
 
     public async execute(userRegisterDto: AdminRegisterDTO): Promise<any> {
-        const { clientId, email, password, dni, shortName, lastName, cuil, phoneNumber, username } =
+        const { clientId, email, password, dni, shortName, lastName, cuil, phoneNumber, username, avatarUrl } =
             userRegisterDto;
 
         const adminExists = await this.adminRepository.findByDni(dni);
@@ -28,7 +28,7 @@ export class AdminRegisterApplication implements IAdminRegisterApplication {
             const userRegister = new Register(username, email, password);
             await this.adminRepository.register(userRegister);
 
-            const admin = new Admin(
+            const admin = new Admin({
                 shortName,
                 lastName,
                 dni,
@@ -36,8 +36,9 @@ export class AdminRegisterApplication implements IAdminRegisterApplication {
                 email,
                 phoneNumber,
                 clientId,
-                username
-            )
+                username,
+                avatarUrl
+            })
 
             await this.adminRepository.create(admin)
 

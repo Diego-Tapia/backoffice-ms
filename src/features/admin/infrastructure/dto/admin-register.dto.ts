@@ -45,6 +45,9 @@ export class AdminRegisterDTO {
   @IsNotEmpty()
   phoneNumber: number;
 
+  @IsString()
+  @IsNotEmpty()
+  avatarUrl: string;
   
   @IsNotEmpty()
   clientId: string;

@@ -47,6 +47,7 @@ export class TokenRepository implements ITokenRepository {
   }
 
   public async update(id: string, updateQuery: UpdateQuery<TokenModel>): Promise<Token> {
+    console.log(updateQuery)
     const model = await this.tokenModel.findByIdAndUpdate(id, {...updateQuery}, {new: true})
       .populate({path: 'applicabilities'})
       .populate({path: 'operations'})
@@ -72,6 +73,9 @@ export class TokenRepository implements ITokenRepository {
       description,
       validFrom,
       validTo,
+      initialAmount,
+      transferable,
+      observation,
       _id,
       createdAt,
       updatedAt } = model
@@ -90,6 +94,9 @@ export class TokenRepository implements ITokenRepository {
       description,
       validFrom,
       validTo,
+      initialAmount,
+      transferable,
+      observation,
       createdAt,
       updatedAt
     })
@@ -111,6 +118,9 @@ export class TokenRepository implements ITokenRepository {
       description,
       validFrom,
       validTo,
+      initialAmount,
+      transferable,
+      observation,
       _id,
       createdAt,
       updatedAt 
@@ -130,6 +140,9 @@ export class TokenRepository implements ITokenRepository {
       description,
       validFrom,
       validTo,
+      initialAmount,
+      transferable,
+      observation,
       createdAt,
       updatedAt
     })
