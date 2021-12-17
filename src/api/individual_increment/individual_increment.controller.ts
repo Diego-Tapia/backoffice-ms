@@ -7,15 +7,13 @@ import { IndividualIncrementDto } from 'src/features/individual_increment/infras
 @ApiTags('increment')
 @Controller('increment')
 export class IncrementController {
-    constructor(
-        @Inject(IncrementTypes.APPLICATION.INDIVIDUAL_INCREMENT)
-        private readonly individualIncrementApplication: IIndividualIncrementApplication,
-    ) { }
+  constructor(
+    @Inject(IncrementTypes.APPLICATION.INDIVIDUAL_INCREMENT)
+    private readonly individualIncrementApplication: IIndividualIncrementApplication,
+  ) {}
 
-
-    @Post('individual')
-    create(@Body() individualIncrementDto: IndividualIncrementDto, @Request() request) {
-        return this.individualIncrementApplication.execute(individualIncrementDto, request)
-    }
-
+  @Post('individual')
+  create(@Body() individualIncrementDto: IndividualIncrementDto, @Request() request) {
+    return this.individualIncrementApplication.execute(individualIncrementDto, request);
+  }
 }

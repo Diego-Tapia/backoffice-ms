@@ -22,9 +22,6 @@ export class MassiveIncreaseRepository implements IMassiveIncreaseRepository {
   }
   async findById(id: string): Promise<MassiveIncrease> {
     const model = await this.massiveIncreaseModel.findById(id).exec();
-    if (!model) {
-      throw new HttpException(`Massive increase #${id} not found`, HttpStatus.NOT_FOUND);
-    }
     return model ? this.toEntity(model) : null;
   }
 
@@ -74,4 +71,3 @@ export class MassiveIncreaseRepository implements IMassiveIncreaseRepository {
     return massiveIncreaseEntity;
   }
 }
-

@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Inject, Injectable, NestMiddleware } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
 import { AdminTypes } from 'src/features/admin/admin.types';
-import { Admin } from 'src/features/admin/domain/admin.entity';
+import { Admin } from 'src/features/admin/domain/entities/admin.entity';
 import { IAdminRepository } from '../../repositories/admin-repository.interface';
 
 export interface RequestModel extends Request {

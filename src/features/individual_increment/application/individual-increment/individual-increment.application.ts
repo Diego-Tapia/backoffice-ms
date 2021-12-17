@@ -71,7 +71,7 @@ export class IndividualIncrementApplication implements IIndividualIncrementAppli
       notes: individualIncrementDto.notes,
       token: individualIncrementDto.tokenId,
       user: request.admin.id,
-      transactionType: ETransactionTypes.INDIVIDUAL_INCREMENT,
+      transactionType: ETransactionTypes.INDIVIDUAL_INCREASE,
       walletFrom: this.mainWallet.id,
       walletTo: this.userWallet.id
     });

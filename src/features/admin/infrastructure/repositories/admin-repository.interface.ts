@@ -1,8 +1,8 @@
-import { Admin } from "../../domain/admin.entity";
-import { Confirm } from "../../domain/confirmAdmin.entity";
-import { Login } from "../../domain/loginAd,on.entity";
-import { Register } from "../../domain/registerAdmin.entity";
-import { AuthResponse } from "../models/auth-response.model";
+import { Admin } from "../../domain/entities/admin.entity";
+import { Confirm } from "../../domain/entities/confirmAdmin.entity";
+import { Login } from "../../domain/entities/loginAd,on.entity";
+import { Register } from "../../domain/entities/registerAdmin.entity";
+import { AuthResponse } from "../../domain/response/auth.response";
 
 export interface IAdminRepository {
   register(userRegister: Register): Promise<void>;

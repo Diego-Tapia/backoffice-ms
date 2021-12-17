@@ -63,7 +63,7 @@ export class IndividualDecrementApplication implements IIndividualDecrementAppli
       notes: individualDecrementDto.notes,
       token: individualDecrementDto.tokenId,
       user: request.admin.id,
-      transactionType: ETransactionTypes.INDIVIDUAL_DECREMENT,
+      transactionType: ETransactionTypes.INDIVIDUAL_DECREASE,
       walletFrom: this.userWallet.id,
       walletTo: this.mainWallet.id
     });

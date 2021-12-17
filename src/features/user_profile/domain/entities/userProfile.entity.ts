@@ -1,3 +1,5 @@
+import { User } from "src/features/user/domain/entities/user.entity";
+
 interface IUserProfile {
   shortName: string;
   lastName: string;
@@ -6,7 +8,8 @@ interface IUserProfile {
   avatarUrl: string;
   email: string;
   phoneNumber: number;
-  userId?: string;
+  userId?: string | User;
+  id?: string;
 }
 
 export class UserProfile {
@@ -17,7 +20,8 @@ export class UserProfile {
   avatarUrl: string;
   email: string;
   phoneNumber: number;
-  userId?: string;
+  userId?: string | User;
+  id?: string;
 
   constructor({
     shortName,
@@ -28,6 +32,7 @@ export class UserProfile {
     email,
     phoneNumber,
     userId,
+    id
   }: IUserProfile) {
     this.shortName = shortName;
     this.lastName = lastName;
@@ -37,5 +42,6 @@ export class UserProfile {
     this.email = email;
     this.phoneNumber = phoneNumber;
     this.userId = userId;
+    this.id = id;
   }
 }

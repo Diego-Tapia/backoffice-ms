@@ -7,7 +7,7 @@ import { IAdminRegisterApplication } from 'src/features/admin/application/admin-
 import { AdminConfirmDTO } from 'src/features/admin/infrastructure/dto/admin-confirm.dto';
 import { AdminLoginDTO } from 'src/features/admin/infrastructure/dto/admin-login.dto';
 import { AdminRegisterDTO } from 'src/features/admin/infrastructure/dto/admin-register.dto';
-import { AuthResponse } from 'src/features/admin/infrastructure/models/auth-response.model';
+import { AuthResponse } from 'src/features/admin/domain/response/auth.response';
 
 @ApiTags('admin')
 @Controller('admin')
