@@ -4,7 +4,7 @@ import configs from 'src/configs/environments/configs';
 import { ConfigType } from '@nestjs/config';
 import { AdminTypes } from '../../admin.types';
 import { AdminConfirmDTO } from '../../infrastructure/dto/admin-confirm.dto';
-import { Confirm } from '../../domain/confirmAdmin.entity';
+import { Confirm } from '../../domain/entities/confirmAdmin.entity';
 import { IAdminRepository } from '../../infrastructure/repositories/admin-repository.interface';
 import { IAdminConfirmApplication } from './admin-confirm-app.interface';
 

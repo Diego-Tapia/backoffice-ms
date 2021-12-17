@@ -5,8 +5,8 @@ import { ConfigType } from '@nestjs/config';
 import { AdminTypes } from '../../admin.types';
 import { IAdminRepository } from '../../infrastructure/repositories/admin-repository.interface';
 import { AdminLoginDTO } from '../../infrastructure/dto/admin-login.dto';
-import { AuthResponse } from '../../infrastructure/models/auth-response.model';
-import { Login } from '../../domain/loginAd,on.entity';
+import { AuthResponse } from '../../domain/response/auth.response';
+import { Login } from '../../domain/entities/loginAd,on.entity';
 import { IAdminLoginApplication } from './admin-login-app.interface';
 
 @Injectable()
@@ -34,6 +34,9 @@ export class AdminLoginApplication implements IAdminLoginApplication {
 
     const payload: any = await this.adminRepository.findOne(username)
     const token = await this.adminRepository.generateJwt(payload);
-    return { token }
+    return { 
+      token, 
+      admin: payload 
+    }
   }
 }

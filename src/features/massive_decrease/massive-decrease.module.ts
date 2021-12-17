@@ -11,9 +11,14 @@ import { WalletsByClientsFeatureModule } from '../wallestByClients/walletsByClie
 import { WalletFeatureModule } from '../wallet/wallet.module';
 import { CancelMassiveDecreaseApplicationProvider } from './application/cancel-massive-decrease/cancel-massive-decrease.provider';
 import { CreateMassiveDecreaseApplicationProvider } from './application/create-massive-decrease/create-massive-decrease.provider';
+import { GetAllMassiveDecreaseApplicationProvider } from './application/get-all-massive-decrease/get-all-massive-decrease.provider';
+import { GetByIdMassiveDecreaseApplicationProvider } from './application/get-by-id-massive-decrease/get-by-id-massive-decrease.provider';
 import { ProcessMassiveDecreaseApplicationProvider } from './application/process-massive-decrease/process-massive-decrease.provider';
 import { ValidateMassiveDecreaseApplicationProvider } from './application/validate-massive-decrease/validate-massive-decrease.provider';
-import { MassiveDecreaseModel, MassiveDecreaseSchema } from './infrastructure/models/massive-decrease.model';
+import {
+  MassiveDecreaseModel,
+  MassiveDecreaseSchema,
+} from './infrastructure/models/massive-decrease.model';
 import { MassiveDecreaseRepositoryProvider } from './infrastructure/repositories/massive-decrease-repository.provider';
 
 @Module({
@@ -27,19 +32,17 @@ import { MassiveDecreaseRepositoryProvider } from './infrastructure/repositories
     BlockchainModule,
     QueueEmitterFeatureModule,
     forwardRef(() => MassiveIncreaseFeatureModule),
-    MongooseModule.forFeature([
-      { name: MassiveDecreaseModel.name, schema: MassiveDecreaseSchema},
-    ]),
+    MongooseModule.forFeature([{ name: MassiveDecreaseModel.name, schema: MassiveDecreaseSchema }]),
   ],
   providers: [
     CreateMassiveDecreaseApplicationProvider,
     ValidateMassiveDecreaseApplicationProvider,
     ProcessMassiveDecreaseApplicationProvider,
     CancelMassiveDecreaseApplicationProvider,
+    GetAllMassiveDecreaseApplicationProvider,
+    GetByIdMassiveDecreaseApplicationProvider,
     MassiveDecreaseRepositoryProvider,
   ],
-  exports: [
-    MassiveDecreaseRepositoryProvider
-  ]
+  exports: [MassiveDecreaseRepositoryProvider],
 })
 export class MassiveDecreaseFeatureModule {}

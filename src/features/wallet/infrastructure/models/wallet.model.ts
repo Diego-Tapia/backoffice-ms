@@ -13,7 +13,10 @@ export class WalletModel extends Document {
   @Prop({ required: true })
   privateKey: string;
 
-  @Prop()
+  @Prop(raw([{
+    tokenId: { type: Types.ObjectId, ref: TokenModel.name },
+    amount: { type: Number }
+  }]))
   balances: IBalances[];
 
 }

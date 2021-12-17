@@ -1,10 +1,10 @@
 import { ConflictException, Inject, Injectable } from '@nestjs/common';
 import { IAdminRegisterApplication } from './admin-register-app.interface';
 import { AdminTypes } from '../../admin.types';
-import { Register } from '../../domain/registerAdmin.entity';
+import { Register } from '../../domain/entities/registerAdmin.entity';
 import { AdminRegisterDTO } from '../../infrastructure/dto/admin-register.dto';
 import { IAdminRepository } from '../../infrastructure/repositories/admin-repository.interface';
-import { Admin } from '../../domain/admin.entity';
+import { Admin } from '../../domain/entities/admin.entity';
 
 
 @Injectable()

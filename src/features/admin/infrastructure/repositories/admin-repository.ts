@@ -6,10 +6,10 @@ import { InjectModel } from "@nestjs/mongoose";
 import { AuthenticationDetails, CognitoUser, CognitoUserAttribute, CognitoUserPool } from "amazon-cognito-identity-js";
 import { Model } from "mongoose";
 import configs from "src/configs/environments/configs";
-import { Admin } from "../../domain/admin.entity";
-import { Confirm } from "../../domain/confirmAdmin.entity";
-import { Login } from "../../domain/loginAd,on.entity";
-import { Register } from "../../domain/registerAdmin.entity";
+import { Admin } from "../../domain/entities/admin.entity";
+import { Confirm } from "../../domain/entities/confirmAdmin.entity";
+import { Login } from "../../domain/entities/loginAd,on.entity";
+import { Register } from "../../domain/entities/registerAdmin.entity";
 import { AdminModel } from "../models/admin.model";
 import { IAdminRepository } from "./admin-repository.interface";
 

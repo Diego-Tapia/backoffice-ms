@@ -29,7 +29,7 @@ export class UserProfileModel extends Document {
   phoneNumber: number;
 
   @Prop({ type: Types.ObjectId, ref: UserModel.name })
-  userId: Types.ObjectId;
+  userId: Types.ObjectId | UserModel;
 }
 
 export const UserProfileSchema = SchemaFactory.createForClass(UserProfileModel);

@@ -8,5 +8,8 @@ export interface IUserProfileRepository {
   findById(id: string): Promise<UserProfile>;
   findOne(dni: any): Promise<UserProfile>;
   findOneQuery(filter: FilterQuery<UserProfileModel>): Promise<UserProfile>;
+  findByIdAndPopulate(id: string): Promise<UserProfile>;
+  findOneQueryAndPopulate(filter: FilterQuery<UserProfileModel>): Promise<UserProfile>
+  findAllByClientIdAndPopulate(clientId: string): Promise<UserProfile[]>
   findOneUser(user: string): Promise<UserProfile>;
 }

@@ -5,4 +5,3 @@ export const GetByIdMassiveIncreaseApplicationProvider = {
   provide: MassiveIncreaseTypes.APPLICATION.GET_BY_ID_MASSIVE_INCREASE,
   useClass: GetByIdMassiveIncreaseApplication,
 };
-

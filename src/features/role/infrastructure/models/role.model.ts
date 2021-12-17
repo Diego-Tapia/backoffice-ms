@@ -4,7 +4,7 @@ import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
   timestamps: true,
 })
 export class RoleModel extends Document {
-  @Prop({ required: true })
+  @Prop({ required: true, enum: ERole })
   name: string;
 
   @Prop()

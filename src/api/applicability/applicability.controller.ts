@@ -2,7 +2,7 @@ import { Inject, Controller, Get, Request } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { IGetAllApplicabilitiesApp } from '../../features/applicability/application/get-all-applicabilities/get-all-applicabilities.app.interface';
 import { ApplicabilityTypes } from '../../features/applicability/applicability.types';
-import { AuthResponse } from 'src/features/admin/infrastructure/models/auth-response.model';
+import { AuthResponse } from 'src/features/admin/domain/response/auth.response';
 
 @ApiTags('applicabilities')
 @Controller('applicabilities')

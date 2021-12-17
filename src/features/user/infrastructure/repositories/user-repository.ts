@@ -68,9 +68,6 @@ export class UserRepository implements IUserRepository {
 
   public async findById(id: string): Promise<User> {
     const userModel = await this.userModel.findById(id).exec();
-    if (!userModel) {
-      throw new HttpException(`User #${id} not found`, HttpStatus.NOT_FOUND);
-    }
     return this.toDomainEntity(userModel);
   }
 

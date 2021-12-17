@@ -1,5 +1,5 @@
 import { AdminConfirmDTO } from "../../infrastructure/dto/admin-confirm.dto";
-import { AuthResponse } from "../../infrastructure/models/auth-response.model";
+import { AuthResponse } from "../../domain/response/auth.response";
 
 export interface IAdminConfirmApplication {
     execute(adminConfirmDTO: AdminConfirmDTO):Promise<AuthResponse>

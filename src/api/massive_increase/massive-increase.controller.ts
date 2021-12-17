@@ -20,9 +20,9 @@ import { MassiveIncreaseDto } from 'src/features/massive_increase/infrastructure
 import { CancelMassiveIncreaseApplication } from 'src/features/massive_increase/application/cancel-massive-increase/cancel-massive-increase.application';
 import { GetAllMassiveIncreaseApplication } from 'src/features/massive_increase/application/get-all-massive-increase/get-all-massive-increase.application';
 import { GetByIdMassiveIncreaseApplication } from 'src/features/massive_increase/application/get-by-id-massive-increase/get-by-id-massive-increase.application';
-import { ApiResponse } from '@nestjs/swagger';
-import { AuthResponse } from 'src/features/admin/infrastructure/models/auth-response.model';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('massive increase')
 @Controller('increase/massive')
 export class MassiveIncreaseCotroller {
   constructor(
@@ -62,35 +62,17 @@ export class MassiveIncreaseCotroller {
     @Request() req: RequestModel,
   ) {
     const { action } = massiveIncreaseDto;
-    if (action === EMassiveIncreaseAction.CREATE)
-      return this.createMassiveIncreaseApplication.execute(excelFile, massiveIncreaseDto, req);
-    if (action === EMassiveIncreaseAction.PROCESS)
-      return this.processMassiveIncreaseApplication.execute(massiveIncreaseDto, req);
-    if (action === EMassiveIncreaseAction.CANCEL)
-      return this.cancelMassiveIncreaseApplication.execute(massiveIncreaseDto);
+    if (action === EMassiveIncreaseAction.CREATE) return this.createMassiveIncreaseApplication.execute(excelFile, massiveIncreaseDto, req);
+    if (action === EMassiveIncreaseAction.PROCESS) return this.processMassiveIncreaseApplication.execute(massiveIncreaseDto, req);
+    if (action === EMassiveIncreaseAction.CANCEL) return this.cancelMassiveIncreaseApplication.execute(massiveIncreaseDto);
   }
 
   @Get('by-client-id')
-  @ApiResponse({
-    status: 201,
-    description: 'Retorna todos los incrementos masivos relacionados a un clientId',
-    type: AuthResponse,
-  })
   findAll(@Request() req) {
     return this.getAllMassiveIncreaseApplication.execute(req);
   }
 
   @Get(':id')
-  @ApiResponse({
-    status: 201,
-    description: 'Retorna un incremento masivo por su id',
-    type: AuthResponse,
-  })
-  @ApiResponse({
-    status: 404,
-    description: 'Incremento masivo no encontrado',
-    type: AuthResponse,
-  })
   findById(@Param('id') id: string) {
     return this.getByIdMassiveIncreaseApplication.execute(id);
   }
