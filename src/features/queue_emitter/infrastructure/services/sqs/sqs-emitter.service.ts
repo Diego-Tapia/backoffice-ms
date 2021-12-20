@@ -13,7 +13,7 @@ export class SqsEmitterService implements ISqsEmitterService {
     private readonly configService: ConfigType<typeof configs>,
   ) {
     const config: SQSClientConfig = {
-      endpoint: this.configService.sqs.sqs_endpoint_url,
+      endpoint: this.configService.app.env === "localhost" ? this.configService.sqs.sqs_endpoint_url : undefined,
       region: process.env.REGION,
       credentials: {
         accessKeyId: this.configService.sqs.accesKeyId,

@@ -41,10 +41,7 @@ export class UserRegisterApplication implements IUserRegisterApplication {
     if (userExists === null) {
       const userRegister = new Register(username, email, password);
       // TODO: CREAR LA WALLET DESDE BLOCKCHAIN - CREAR SERVICIO PARA CONSUMIR BLOCKCHAIN-MS Y CREAR LA WALLET
-      const wallet = await this.walletRepository.create({
-        address: 'address_1',
-        privateKey: 'privateKey_1'
-      })
+      const wallet = await this.walletRepository.create()
 
       await this.userRepository.register(userRegister);
      

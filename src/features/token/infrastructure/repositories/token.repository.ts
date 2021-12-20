@@ -46,7 +46,7 @@ export class TokenRepository implements ITokenRepository {
     return model ? this.toEntity(model) : null;
   }
 
-  public async update(id: string, updateQuery: UpdateQuery<TokenModel>): Promise<Token> {
+  public async update(id: string, updateQuery: UpdateQuery<any>): Promise<Token> {
     console.log(updateQuery)
     const model = await this.tokenModel.findByIdAndUpdate(id, {...updateQuery}, {new: true})
       .populate({path: 'applicabilities'})

@@ -7,5 +7,5 @@ export interface ITokenRepository {
   findAll(filter?: FilterQuery<TokenModel>): Promise<Token[]>;
   findById(id: string): Promise<Token>;
   findLastCreated(): Promise<Token>;
-  update(id: string, update: UpdateQuery<TokenModel>): Promise<Token>;
+  update(id: string, update: UpdateQuery<any>): Promise<Token>;
 }

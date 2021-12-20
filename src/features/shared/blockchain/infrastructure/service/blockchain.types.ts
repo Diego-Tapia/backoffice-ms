@@ -4,8 +4,5 @@ export const BlockchainTypes = {
     TRANSACTION: Symbol('BlockchainTransactionService'),
     WALLET: Symbol('BlockchainWalletService')
   },
-  LIBRARY: {
-    AXIOS: Symbol('AxiosLibrary')
-  }
 };
   

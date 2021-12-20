@@ -47,11 +47,15 @@ export class IndividualIncrementApplication implements IIndividualIncrementAppli
     const user = await this.userRepository.findOne(individualIncrementDto.userName);
     if (!user) throw new HttpException('USER NOT-FOUND', HttpStatus.NOT_FOUND);
     if (!user.walletId) {
-      this.userWallet = await this.blockchainWalletService.create();
-      this.userRepository.updateQuery(user.id, { walletId: this.userWallet.id });
+      
+      // TODO CREAR WALLET DESDE API BLOCKCHAIN-MS
+      // this.userWallet = await this.blockchainWalletService.create();
+      this.userWallet = await this.walletRepository.create()
+      await this.userRepository.updateQuery(user.id, { walletId: this.userWallet.id });
+      
     }
     else this.userWallet = await this.walletRepository.findById(user.walletId);
-
+    if (!this.userWallet) throw new HttpException('THIS USER WALLET WAS NOT FOUND', HttpStatus.NOT_FOUND);
     //ADMIN
     const clientWallet = await this.walletByClientRepository.findOne({ clientId: clientId })
     if (!clientWallet) throw new HttpException(`The WalletByClient with the clientId "${clientId}" was not found`, HttpStatus.NOT_FOUND);

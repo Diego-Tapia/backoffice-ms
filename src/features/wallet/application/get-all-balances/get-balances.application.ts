@@ -1,23 +1,24 @@
-import { Inject, Injectable } from "@nestjs/common";
-import { BlockchainTypes } from "src/features/shared/blockchain/infrastructure/service/blockchain.types";
-import { IBlockhainWalletServices } from "src/features/shared/blockchain/infrastructure/service/wallet/blockchain-wallet.interface";
+import { HttpException, HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { IGetBalancesApplication } from "./get-balances.app.interface";
 import { IGetBalances } from "../../domain/interfaces/getbalances.interface";
 import { Wallet } from "../../domain/entities/wallet.entity";
+import { WalletTypes } from "../../wallet.type";
+import { IWalletRepository } from "../../infrastructure/repositories/wallet-repository.interface";
 
 
 @Injectable()
 export class GetBalancesApplication implements IGetBalancesApplication {
 
   constructor(
-      @Inject(BlockchainTypes.INFRASTRUCTURE.WALLET) 
-      private readonly blockchainService: IBlockhainWalletServices
+    @Inject(WalletTypes.INFRASTRUCTURE.REPOSITORY)
+    private readonly walletRepository: IWalletRepository
   ) {}
 
-  public async execute(wallet_id: string): Promise<IGetBalances> {
-    const wallet:Wallet = await this.blockchainService.findOne(wallet_id)    
+  public async execute(walletId: string): Promise<IGetBalances> {
+    const wallet: Wallet = await this.walletRepository.findById(walletId)
+    if (!wallet) throw new HttpException('Wallet not found', HttpStatus.NOT_FOUND)
     let total: number = 0;
-    wallet.balances.forEach( singleBalance => total+= +singleBalance.amount )
+    wallet.balances.forEach(singleBalance => total += +singleBalance.amount)
     return { total, balances: wallet.balances }
   }
 }

@@ -21,7 +21,7 @@ export class UpdateTokenApplication implements IUpdateTokenApplication {
     if (validateUniqueValues) throw new BadRequestException(validateUniqueValues)
     
     try {
-      return this.tokenRepository.update(id, {updateTokenDto})
+      return this.tokenRepository.update(id, updateTokenDto)
     } catch (error) {
       throw new HttpException(error, error.status || HttpStatus.INTERNAL_SERVER_ERROR);
     }

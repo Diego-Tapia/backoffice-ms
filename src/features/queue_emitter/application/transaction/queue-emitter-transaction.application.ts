@@ -1,4 +1,4 @@
-import { Inject } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
 import configs from 'src/configs/environments/configs';
 import { ITransactionQueueMessage } from '../../domain/interfaces/transaction-queue-message.interface';
@@ -6,6 +6,7 @@ import { ISqsEmitterService } from '../../infrastructure/services/sqs/sqs-emitte
 import { QueueEmitterTypes } from '../../queue-emitter.types';
 import { IQueueEmitterTransactionApplication } from './queue-emitter-transaction-app.interface';
 
+@Injectable()
 export class QueueEmitterTransactionApplication implements IQueueEmitterTransactionApplication {
   constructor(
     @Inject(QueueEmitterTypes.INFRASTRUCTURE.SQS_EMITTER_SERVICE)
