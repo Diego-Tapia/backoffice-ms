@@ -10,5 +10,6 @@ export default Joi.object({
   AWS_ACCESS_KEY_ID: Joi.string().required(),
   AWS_SECRET_ACCESS_KEY: Joi.string().required(),
   SECRET: Joi.string().required(),
+  BLOCKCHAIN_URL: Joi.string().required(),
   //SQS_ENDPOINT_URL: Joi.string().required()
 });

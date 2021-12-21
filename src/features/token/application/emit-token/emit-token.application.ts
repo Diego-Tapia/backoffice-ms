@@ -30,15 +30,12 @@ export class EmitTokenApplication implements IEmitTokenApplication {
     private readonly walletRepository: IWalletRepository,
     @Inject(WalletsByClientsTypes.INFRASTRUCTURE.REPOSITORY)
     private readonly walletByClientRepository: IWalletsByClientsRepository,
-    @Inject(BlockchainTypes.INFRASTRUCTURE.TRANSACTION)
-    private readonly blockchainTransactionService: IBlockchainTransactionService,
     @Inject(BlockchainTypes.INFRASTRUCTURE.TOKEN)
     private readonly blockchainTokenService: IBlockchainTokenService,
-    @Inject(QueueEmitterTypes.APPLICATION.EMITTER_TRANSACTION)
-    private readonly QueueEmitterTransactionApplication: IQueueEmitterTransactionApplication,
   ) {}
 
   public async execute(id: string, request: RequestModel): Promise<void> {
+    
     const { clientId } = request.admin;
 
     const token: Token = await this.tokenRepository.findById(id);
@@ -54,27 +51,8 @@ export class EmitTokenApplication implements IEmitTokenApplication {
 
     await this.blockchainTokenService.emitToken(token.id, request.admin.id)
     
-    const transaction = new Transaction({
-      amount: token.initialAmount,
-      notes: `Emisión inicial: ${token.shortName}`,
-      token: token.id,
-      user: request.admin.id,
-      transactionType: ETransactionTypes.EMISION,
-      walletFrom: null,
-      walletTo: this.mainWallet.id
-    });
-
-    //SQS
-    const SQSTransaction = {
-      ...transaction,
-      tokenId: transaction.token,
-      userId: transaction.user
-    }
-
-    
     try {
       await this.tokenRepository.update(id, { emited: true });
-      this.QueueEmitterTransactionApplication.execute(SQSTransaction)
     } catch (error) {
       throw new HttpException('Error actualizando el estado del token', HttpStatus.INTERNAL_SERVER_ERROR)      
     }

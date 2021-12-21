@@ -22,7 +22,6 @@ import { TokenRepositoryProvider } from './infrastructure/repositories/token-rep
     TransactionTypeFeatureModule,
     ApplicabilityModule,
     BlockchainModule,
-    QueueEmitterFeatureModule,
     WalletsByClientsFeatureModule,
     WalletFeatureModule,
     MongooseModule.forFeature([{ name: TokenModel.name, schema: TokenSchema }])],
