@@ -18,14 +18,10 @@ import { User } from "src/features/user/domain/entities/user.entity";
 import { UserProfile } from "src/features/user_profile/domain/entities/userProfile.entity";
 import { UserProfileTypes } from "src/features/user_profile/user.types";
 import { IUserProfileRepository } from "src/features/user_profile/infrastructure/repositories/user-repository.interface";
+import { IBalances } from "src/features/wallet/domain/interfaces/balances.interface";
 
 @Injectable()
 export class IndividualDecrementApplication implements IIndividualDecrementApplication {
-
-  private total: number;
-  private userWallet: Wallet;
-  private mainWallet: Wallet;
-
   constructor(
     @Inject(WalletTypes.INFRASTRUCTURE.REPOSITORY)
     private readonly walletRepository: IWalletRepository,
@@ -45,6 +41,8 @@ export class IndividualDecrementApplication implements IIndividualDecrementAppli
     const { clientId } = request.admin;
     let userTemp: User;
     let userProfile: UserProfile
+    let userWallet: Wallet;
+    let mainWallet: Wallet;
 
     const isNumber = !isNaN(Number(userIdentifier)); 
     
@@ -62,20 +60,19 @@ export class IndividualDecrementApplication implements IIndividualDecrementAppli
 
     if (!user) throw new HttpException('USER NOT-FOUND', HttpStatus.NOT_FOUND);
     if (!user.walletId) throw new HttpException('THIS USER HAS NO WALLET', HttpStatus.NOT_FOUND);
-    this.userWallet = await this.walletRepository.findById(user.walletId);
-    if (!this.userWallet) throw new HttpException('THIS USER WALLET WAS NOT FOUND', HttpStatus.NOT_FOUND);
+    userWallet = await this.walletRepository.findById(user.walletId);
+    if (!userWallet) throw new HttpException('THIS USER WALLET WAS NOT FOUND', HttpStatus.NOT_FOUND);
     //ADMIN
     const clientWallet = await this.walletByClientRepository.findOne({ clientId: clientId })
     if (!clientWallet) throw new HttpException(`The WalletByClient with the clientId "${clientId}" was not found`, HttpStatus.NOT_FOUND);
-    this.mainWallet = await this.walletRepository.findById(clientWallet.walletId);
-    if (!this.mainWallet) throw new HttpException(`The wallet with the id "${clientWallet.walletId}" was not found`, HttpStatus.NOT_FOUND);
+    mainWallet = await this.walletRepository.findById(clientWallet.walletId);
+    if (!mainWallet) throw new HttpException(`The wallet with the id "${clientWallet.walletId}" was not found`, HttpStatus.NOT_FOUND);
 
     //CHECK BALANCE
-    const { balances } = await this.getBalances.execute(this.userWallet.id);
-    balances.forEach(balance => {
-      if (balance.tokenId === tokenId) this.total = balance.amount;
-    })
-    if (this.total < amount) throw new HttpException('THE USER WALLET HAS INSUFFICIENT FUNDS', HttpStatus.FORBIDDEN);
+    const { balances } = await this.getBalances.execute(userWallet.id);
+    let balance: IBalances = balances.find(balance => balance.tokenId.toString() === tokenId);
+    if (!balance) throw new HttpException('THE USER WALLET HAS INSUFFICIENT FUNDS', HttpStatus.FORBIDDEN);
+    if (balance.amount < amount) throw new HttpException('THE USER WALLET HAS INSUFFICIENT FUNDS', HttpStatus.FORBIDDEN);
 
     const transaction = new Transaction({
       amount,
@@ -83,8 +80,8 @@ export class IndividualDecrementApplication implements IIndividualDecrementAppli
       token: tokenId,
       user: request.admin.id,
       transactionType: ETransactionTypes.INDIVIDUAL_DECREASE,
-      walletFrom: this.userWallet.id,
-      walletTo: this.mainWallet.id
+      walletFrom: userWallet.id,
+      walletTo: mainWallet.id
     });
 
     //SQS
