@@ -49,6 +49,6 @@ export class ReemitTokenApplication implements IReemitTokenApplication {
     this.mainWallet = await this.walletRepository.findById(clientWallet.walletId);
     if (!this.mainWallet) throw new NotFoundException("Wallet de cliente no encontrada.");
 
-    await this.blockchainTokenService.reemitToken(token.id, request.admin.id, amount)
+    await this.blockchainTokenService.emitToken(token.id, request.admin.id, amount)
   }
 }

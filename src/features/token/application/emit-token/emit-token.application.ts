@@ -49,7 +49,7 @@ export class EmitTokenApplication implements IEmitTokenApplication {
     this.mainWallet = await this.walletRepository.findById(clientWallet.walletId);
     if (!this.mainWallet) throw new NotFoundException("Wallet de cliente no encontrada.");
 
-    await this.blockchainTokenService.emitToken(token.id, request.admin.id)
+    await this.blockchainTokenService.emitToken(token.id, request.admin.id, token.initialAmount)
     
     try {
       await this.tokenRepository.update(id, { emited: true });
