@@ -45,15 +45,16 @@ export class IndividualDecrementApplication implements IIndividualDecrementAppli
     const { clientId } = request.admin;
     let userTemp: User;
     let userProfile: UserProfile
+
     const isNumber = !isNaN(Number(userIdentifier)); 
     
     //USER
     if (isNumber) {
-      userProfile = await this.userProfileRepository.findOneByParams(userIdentifier as number)
+      userProfile = await this.userProfileRepository.findOneByParams(+userIdentifier)
     }
 
     if (!userProfile && !isNumber ) {
-      userTemp = await this.userRepository.findOneByParams(userIdentifier as string);
+      userTemp = await this.userRepository.findOneByParams(userIdentifier);
     }
     
     const user =  userTemp || userProfile?.userId as User
