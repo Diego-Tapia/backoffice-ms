@@ -49,7 +49,7 @@ export class IndividualIncrementApplication implements IIndividualIncrementAppli
     
     //USER
     if (isNumber) {
-      userProfile = await this.userProfileRepository.findOneByParams(userIdentifier as number)
+      userProfile = await this.userProfileRepository.findOneByParams(+userIdentifier)
     }
 
     if (!userProfile && !isNumber ) {

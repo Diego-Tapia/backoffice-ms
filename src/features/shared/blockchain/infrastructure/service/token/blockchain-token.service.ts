@@ -19,9 +19,17 @@ export class BlockchainTokenService implements IBlockchainTokenService {
     this.BLOCKCHAIN_URL = this.configService.blockchain_ms.url
   }
 
-  async emitToken(item_id: number, amount: number): Promise<Token>{
+  async emitToken(tokenId: string, idAdmin: string): Promise<Token>{
     try {
-      return await this.axios.post(`${this.BLOCKCHAIN_URL}token`, {item_id, amount})
+      return await this.axios.post(`${this.BLOCKCHAIN_URL}/token/${tokenId}/emit`, {idAdmin: idAdmin})
+    } catch (error) {
+      throw new AxiosException(error)
+    }
+  }
+
+  async reemitToken(item_id: number, amount: number): Promise<Token>{
+    try {
+      return await this.axios.post(`${this.BLOCKCHAIN_URL}/token/${item_id}/reemit`, amount)
     } catch (error) {
       throw new AxiosException(error)
     }
