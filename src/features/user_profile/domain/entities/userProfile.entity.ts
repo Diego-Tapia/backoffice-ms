@@ -10,6 +10,8 @@ interface IUserProfile {
   phoneNumber: number;
   userId?: string | User;
   id?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export class UserProfile {
@@ -22,6 +24,8 @@ export class UserProfile {
   phoneNumber: number;
   userId?: string | User;
   id?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 
   constructor({
     shortName,
@@ -32,7 +36,9 @@ export class UserProfile {
     email,
     phoneNumber,
     userId,
-    id
+    id,
+    createdAt,
+    updatedAt
   }: IUserProfile) {
     this.shortName = shortName;
     this.lastName = lastName;
@@ -43,5 +49,7 @@ export class UserProfile {
     this.phoneNumber = phoneNumber;
     this.userId = userId;
     this.id = id;
+    this.createdAt = createdAt;
+    this.updatedAt = updatedAt;
   }
 }

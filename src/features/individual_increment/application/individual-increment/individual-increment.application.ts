@@ -1,7 +1,4 @@
 import { HttpException, HttpStatus, Inject, Injectable } from "@nestjs/common";
-
-import { BlockchainTypes } from "src/features/shared/blockchain/infrastructure/service/blockchain.types";
-import { IBlockhainWalletServices } from "src/features/shared/blockchain/infrastructure/service/wallet/blockchain-wallet.interface";
 import { Transaction } from "src/features/transaction/domain/entities/transaction.entity";
 import { IUserRepository } from "src/features/user/infrastructure/repositories/user-reposiory.interface";
 import { UserTypes } from "src/features/user/user.types";
@@ -17,6 +14,10 @@ import { RequestModel } from "src/features/admin/infrastructure/service/middlewa
 import { Wallet } from "src/features/wallet/domain/entities/wallet.entity";
 import { IQueueEmitterTransactionApplication } from "src/features/queue_emitter/application/transaction/queue-emitter-transaction-app.interface";
 import { QueueEmitterTypes } from "src/features/queue_emitter/queue-emitter.types";
+import { UserProfileTypes } from "src/features/user_profile/user.types";
+import { IUserProfileRepository } from "src/features/user_profile/infrastructure/repositories/user-repository.interface";
+import { UserProfile } from "src/features/user_profile/domain/entities/userProfile.entity";
+import { User } from "src/features/user/domain/entities/user.entity";
 
 @Injectable()
 export class IndividualIncrementApplication implements IIndividualIncrementApplication {
@@ -26,8 +27,6 @@ export class IndividualIncrementApplication implements IIndividualIncrementAppli
   private mainWallet: Wallet;
 
   constructor(
-    @Inject(BlockchainTypes.INFRASTRUCTURE.WALLET)
-    private readonly blockchainWalletService: IBlockhainWalletServices,
     @Inject(WalletTypes.INFRASTRUCTURE.REPOSITORY)
     private readonly walletRepository: IWalletRepository,
     @Inject(WalletsByClientsTypes.INFRASTRUCTURE.REPOSITORY)
@@ -36,16 +35,31 @@ export class IndividualIncrementApplication implements IIndividualIncrementAppli
     private readonly getBalances: IGetBalancesApplication,
     @Inject(UserTypes.INFRASTRUCTURE.REPOSITORY)
     private readonly userRepository: IUserRepository,
+    @Inject(UserProfileTypes.INFRASTRUCTURE.REPOSITORY)
+    private readonly userProfileRepository : IUserProfileRepository,
     @Inject(QueueEmitterTypes.APPLICATION.EMITTER_TRANSACTION)
     private readonly QueueEmitterTransactionApplication: IQueueEmitterTransactionApplication,
   ) { }
 
-  async execute(individualIncrementDto: IndividualIncrementDto, request: RequestModel) {
+  async execute({userIdentifier, amount, tokenId, notes}: IndividualIncrementDto, request: RequestModel) {
     const { clientId } = request.admin;
-
+    let userTemp: User;
+    let userProfile: UserProfile
+    const isNumber = !isNaN(Number(userIdentifier)); 
+    
     //USER
-    const user = await this.userRepository.findOne(individualIncrementDto.userName);
+    if (isNumber) {
+      userProfile = await this.userProfileRepository.findOneByParams(userIdentifier as number)
+    }
+
+    if (!userProfile && !isNumber ) {
+      userTemp = await this.userRepository.findOneByParams(userIdentifier as string);
+    }
+    
+    const user =  userTemp || userProfile?.userId as User
+
     if (!user) throw new HttpException('USER NOT-FOUND', HttpStatus.NOT_FOUND);
+    
     if (!user.walletId) {
       
       // TODO CREAR WALLET DESDE API BLOCKCHAIN-MS
@@ -66,14 +80,14 @@ export class IndividualIncrementApplication implements IIndividualIncrementAppli
     //CHECK BALANCE
     const { balances } = await this.getBalances.execute(this.mainWallet.id);
     balances.forEach(balance => {
-      if (balance.tokenId === individualIncrementDto.tokenId) this.total = balance.amount;
+      if (balance.tokenId === tokenId) this.total = balance.amount;
     })
-    if (this.total < individualIncrementDto.amount) throw new HttpException('THE MAIN WALLET HAS INSUFFICIENT FUNDS', HttpStatus.FORBIDDEN);
+    if (this.total < amount) throw new HttpException('THE MAIN WALLET HAS INSUFFICIENT FUNDS', HttpStatus.FORBIDDEN);
 
     const transaction = new Transaction({
-      amount: individualIncrementDto.amount,
-      notes: individualIncrementDto.notes,
-      token: individualIncrementDto.tokenId,
+      amount,
+      notes,
+      token: tokenId,
       user: request.admin.id,
       transactionType: ETransactionTypes.INDIVIDUAL_INCREASE,
       walletFrom: this.mainWallet.id,

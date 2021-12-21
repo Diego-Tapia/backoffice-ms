@@ -9,6 +9,8 @@ interface IAdmin {
   username: string;
   avatarUrl: string;
   id?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export class Admin {
@@ -22,6 +24,8 @@ export class Admin {
   username: string;
   avatarUrl: string;
   id?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 
   constructor({
     shortName,
@@ -34,6 +38,8 @@ export class Admin {
     username,
     avatarUrl,
     id,
+    createdAt,
+    updatedAt,
   }: IAdmin) {
     this.shortName = shortName;
     this.lastName = lastName;
@@ -45,5 +51,7 @@ export class Admin {
     this.username = username;
     this.avatarUrl = avatarUrl;
     this.id = id;
+    this.createdAt = createdAt;
+    this.updatedAt = updatedAt;
   }
 }

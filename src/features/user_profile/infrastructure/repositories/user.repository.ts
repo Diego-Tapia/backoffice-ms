@@ -10,7 +10,10 @@ import { IUserProfileRepository } from './user-repository.interface';
 
 @Injectable()
 export class UserRepository implements IUserProfileRepository {
-  constructor(@InjectModel(UserProfileModel.name) private readonly userModel: Model<UserProfileModel>) { }
+  constructor(
+    @InjectModel(UserProfileModel.name) 
+    private readonly userModel: Model<UserProfileModel>
+  ) { }
 
   public async create(user: UserProfile): Promise<UserProfile> {
     const savedUser = await new this.userModel(user).save();
@@ -40,6 +43,14 @@ export class UserRepository implements IUserProfileRepository {
   public async findOneUser(username: string): Promise<UserProfile> {
     const userModel = await this.userModel.findOne({ username: username }).exec();
     return userModel ? this.toDomainEntity(userModel) : null;
+  }
+
+  public async findOneByParams(param: number): Promise<UserProfile> {
+    const userModel = await this.userModel
+      .findOne( { $or: [ { dni: param }, { cuil: param } ] } )
+      .populate({path: 'userId'})
+      .exec();
+    return userModel ? this.toDomainEntityAndPopulate(userModel) : null;
   }
 
   // POPULATES
@@ -76,7 +87,7 @@ export class UserRepository implements IUserProfileRepository {
 
 
   private toDomainEntity(model: UserProfileModel):UserProfile{
-    const { shortName, lastName, dni, cuil, avatarUrl, email, phoneNumber, userId, _id } = model;
+    const { shortName, lastName, dni, cuil, avatarUrl, email, phoneNumber, userId, _id, createdAt, updatedAt } = model;
     const userEntity = new UserProfile({
       shortName,
       lastName,
@@ -86,13 +97,15 @@ export class UserRepository implements IUserProfileRepository {
       email,
       phoneNumber,
       userId: userId.toString(),
-      id: _id.toString()
+      id: _id.toString(),
+      createdAt,
+      updatedAt
     });
     return userEntity;
   }
 
   private toDomainEntityAndPopulate(model: UserProfileModel):UserProfile{
-    const { shortName, lastName, dni, cuil, avatarUrl, email, phoneNumber, userId, _id } = model;
+    const { shortName, lastName, dni, cuil, avatarUrl, email, phoneNumber, userId, _id, createdAt, updatedAt } = model;
     const userEntity = new UserProfile({
       shortName,
       lastName,
@@ -103,6 +116,8 @@ export class UserRepository implements IUserProfileRepository {
       phoneNumber,
       userId: this.toEntityUser(userId as UserModel),
       id: _id.toString(),
+      createdAt,
+      updatedAt
     });
     return userEntity;
   }

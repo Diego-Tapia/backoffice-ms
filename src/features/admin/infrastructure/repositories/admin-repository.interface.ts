@@ -1,8 +1,10 @@
+import { FilterQuery } from "mongoose";
 import { Admin } from "../../domain/entities/admin.entity";
 import { Confirm } from "../../domain/entities/confirmAdmin.entity";
 import { Login } from "../../domain/entities/loginAd,on.entity";
 import { Register } from "../../domain/entities/registerAdmin.entity";
 import { AuthResponse } from "../../domain/response/auth.response";
+import { AdminModel } from "../models/admin.model";
 
 export interface IAdminRepository {
   register(userRegister: Register): Promise<void>;
@@ -13,4 +15,6 @@ export interface IAdminRepository {
   create(admin: Admin): Promise<Admin>;
   findOne(username: string): Promise<Admin>;
   findByDni(dni: number): Promise<Admin>;
+  findAll(FilterQuery?: FilterQuery<AdminModel>): Promise<Admin[]>;
+  findById(id: string): Promise<Admin>;
 }

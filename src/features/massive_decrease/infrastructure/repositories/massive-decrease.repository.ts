@@ -1,9 +1,11 @@
+import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { FilterQuery, Model, UpdateQuery } from "mongoose";
 import { MassiveDecrease } from "../../domain/entities/massive-decrease.entity";
 import { MassiveDecreaseModel } from "../models/massive-decrease.model";
 import { IMassiveDecreaseRepository } from "./massive-decrease-repository.interface";
 
+@Injectable()
 export class MassiveDecreaseRepository implements IMassiveDecreaseRepository{
   constructor(
     @InjectModel(MassiveDecreaseModel.name) 

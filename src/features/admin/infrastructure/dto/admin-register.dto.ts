@@ -46,10 +46,13 @@ export class AdminRegisterDTO {
   phoneNumber: number;
 
   @IsString()
-  @IsNotEmpty()
   avatarUrl: string;
   
+  @IsMongoId()
   @IsNotEmpty()
   clientId: string;
 
+  // @IsMongoId()
+  // @IsNotEmpty()
+  // role: string;
 }

@@ -76,6 +76,13 @@ export class UserRepository implements IUserRepository {
     return UserModel.map((user) => this.toDomainEntity(user));
   }
 
+  public async findOneByParams(param: string): Promise<User> {
+    const userModel = await this.userModel
+      .findOne( { $or: [ { customId: param }, { username: param } ] } )
+      .exec();
+    return userModel ? this.toDomainEntity(userModel) : null;
+  }
+
   private toDomainEntity(model: UserModel): User {
     const { customId, username, status, _id, clientId, walletId } = model;
     const userEntity = new User({

@@ -14,6 +14,10 @@ import { RequestModel } from "src/features/admin/infrastructure/service/middlewa
 import { Wallet } from "src/features/wallet/domain/entities/wallet.entity";
 import { IQueueEmitterTransactionApplication } from "src/features/queue_emitter/application/transaction/queue-emitter-transaction-app.interface";
 import { QueueEmitterTypes } from "src/features/queue_emitter/queue-emitter.types";
+import { User } from "src/features/user/domain/entities/user.entity";
+import { UserProfile } from "src/features/user_profile/domain/entities/userProfile.entity";
+import { UserProfileTypes } from "src/features/user_profile/user.types";
+import { IUserProfileRepository } from "src/features/user_profile/infrastructure/repositories/user-repository.interface";
 
 @Injectable()
 export class IndividualDecrementApplication implements IIndividualDecrementApplication {
@@ -31,15 +35,30 @@ export class IndividualDecrementApplication implements IIndividualDecrementAppli
     private readonly getBalances: IGetBalancesApplication,
     @Inject(UserTypes.INFRASTRUCTURE.REPOSITORY)
     private readonly userRepository: IUserRepository,
+    @Inject(UserProfileTypes.INFRASTRUCTURE.REPOSITORY)
+    private readonly userProfileRepository : IUserProfileRepository,
     @Inject(QueueEmitterTypes.APPLICATION.EMITTER_TRANSACTION)
     private readonly QueueEmitterTransactionApplication: IQueueEmitterTransactionApplication,
   ) { }
 
-  async execute(individualDecrementDto: IndividualDecrementDto, request: RequestModel) {
+  async execute({userIdentifier, amount, notes, tokenId}: IndividualDecrementDto, request: RequestModel) {
     const { clientId } = request.admin;
-
+    let userTemp: User;
+    let userProfile: UserProfile
+    const isNumber = !isNaN(Number(userIdentifier)); 
+    
     //USER
-    const user = await this.userRepository.findOne(individualDecrementDto.userName);
+    if (isNumber) {
+      userProfile = await this.userProfileRepository.findOneByParams(userIdentifier as number)
+    }
+
+    if (!userProfile && !isNumber ) {
+      userTemp = await this.userRepository.findOneByParams(userIdentifier as string);
+    }
+    
+    const user =  userTemp || userProfile?.userId as User
+    if (!user) throw new HttpException('USER NOT-FOUND', HttpStatus.NOT_FOUND);
+
     if (!user) throw new HttpException('USER NOT-FOUND', HttpStatus.NOT_FOUND);
     if (!user.walletId) throw new HttpException('THIS USER HAS NO WALLET', HttpStatus.NOT_FOUND);
     this.userWallet = await this.walletRepository.findById(user.walletId);
@@ -53,15 +72,14 @@ export class IndividualDecrementApplication implements IIndividualDecrementAppli
     //CHECK BALANCE
     const { balances } = await this.getBalances.execute(this.userWallet.id);
     balances.forEach(balance => {
-      if (balance.tokenId === individualDecrementDto.tokenId) this.total = balance.amount;
+      if (balance.tokenId === tokenId) this.total = balance.amount;
     })
-    if (this.total < individualDecrementDto.amount) throw new HttpException('THE USER WALLET HAS INSUFFICIENT FUNDS', HttpStatus.FORBIDDEN);
+    if (this.total < amount) throw new HttpException('THE USER WALLET HAS INSUFFICIENT FUNDS', HttpStatus.FORBIDDEN);
 
     const transaction = new Transaction({
-      hash: 'HASH',
-      amount: individualDecrementDto.amount,
-      notes: individualDecrementDto.notes,
-      token: individualDecrementDto.tokenId,
+      amount,
+      notes,
+      token: tokenId,
       user: request.admin.id,
       transactionType: ETransactionTypes.INDIVIDUAL_DECREASE,
       walletFrom: this.userWallet.id,

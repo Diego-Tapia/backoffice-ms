@@ -87,8 +87,9 @@ export class ProcessMassiveIncreaseApplication implements IProcessMassiveIncreas
         if (!userProfile && !isNaN(Number(detail.userId))) userProfile = await this.userProfileRepository.findOneQuery({ cuil: Number(detail.userId) });
         if (!userProfile && !isNaN(Number(detail.userId))) userProfile = await this.userProfileRepository.findOneQuery({ dni: Number(detail.userId) }); 
         
-        const user = (userProfile) ? await this.userRepository.findOneQuery({ _id: userProfile.userId }) : null;
-          
+        let user = (userProfile) ? await this.userRepository.findOneQuery({ _id: userProfile.userId }) : null;
+        // TODO si user es null consultar por customId
+        
         if (!user) {
           detail.error.push('El usuario no existe');
           detail.status = EMassiveIncreaseDetailStatus.INVALID

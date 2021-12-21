@@ -37,7 +37,6 @@ export class CreateAdminDto {
   phoneNumber: number;
 
   @IsString()
-  @IsNotEmpty()
   avatarUrl: string;
 
   @IsMongoId()

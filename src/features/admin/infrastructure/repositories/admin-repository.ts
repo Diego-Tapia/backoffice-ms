@@ -4,7 +4,7 @@ import { ConfigType } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 import { InjectModel } from "@nestjs/mongoose";
 import { AuthenticationDetails, CognitoUser, CognitoUserAttribute, CognitoUserPool } from "amazon-cognito-identity-js";
-import { Model } from "mongoose";
+import { FilterQuery, Model } from "mongoose";
 import configs from "src/configs/environments/configs";
 import { Admin } from "../../domain/entities/admin.entity";
 import { Confirm } from "../../domain/entities/confirmAdmin.entity";
@@ -112,6 +112,18 @@ export class AdminRepository implements IAdminRepository {
     return adminModel ? this.toDomainEntity(adminModel) : null;
   }
 
+  public async findAll(filterQuery: FilterQuery<AdminModel>): Promise<Admin[]> {
+    const adminModels = await this.adminModel.find(filterQuery).exec();
+    return (adminModels.length > 0) 
+      ? adminModels.map(adminModel => this.toDomainEntity(adminModel))  
+      : null;
+  }
+
+  public async findById(id: string): Promise<Admin> {
+    const adminModel = await this.adminModel.findById(id).exec();
+    return this.toDomainEntity(adminModel);
+  }
+
   public async create(admin: Admin): Promise<Admin> {
     const savedAdmin = await new this.adminModel(admin).save();
     return this.toDomainEntity(savedAdmin);
@@ -119,7 +131,7 @@ export class AdminRepository implements IAdminRepository {
 
 
   private  toDomainEntity(model: AdminModel): Admin{
-    const { shortName, lastName, dni, cuil, email, clientId, phoneNumber, username, _id, avatarUrl } = model;
+    const { shortName, lastName, dni, cuil, email, clientId, phoneNumber, username, _id, avatarUrl, createdAt, updatedAt } = model;
     const adminEntity = new Admin({
         shortName,
         lastName,
@@ -130,7 +142,9 @@ export class AdminRepository implements IAdminRepository {
         clientId: clientId.toString(),
         username,
         avatarUrl,
-        id: _id.toString()
+        id: _id.toString(),
+        createdAt,
+        updatedAt,
     });
     return  adminEntity;
   }

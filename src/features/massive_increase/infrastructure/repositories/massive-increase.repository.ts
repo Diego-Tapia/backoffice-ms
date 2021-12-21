@@ -1,10 +1,11 @@
-import { HttpException, HttpStatus } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model, UpdateQuery } from 'mongoose';
 import { MassiveIncrease } from '../../domain/entities/massive-increase.entity';
 import { MassiveIncreaseModel } from '../models/massive-increase.model';
 import { IMassiveIncreaseRepository } from './massive-increase-repository.interface';
 
+@Injectable()
 export class MassiveIncreaseRepository implements IMassiveIncreaseRepository {
   constructor(
     @InjectModel(MassiveIncreaseModel.name)

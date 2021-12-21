@@ -10,6 +10,7 @@ import { DecrementFeatureModule } from './features/individual_decrement/decremen
 import { IncrementFeatureModule } from './features/individual_increment/increment.module';
 import { MassiveDecreaseFeatureModule } from './features/massive_decrease/massive-decrease.module';
 import { MassiveIncreaseFeatureModule } from './features/massive_increase/massive-increase.module';
+import { RoleFeatureModule } from './features/role/role.module';
 import { TokenFeatureModule } from './features/token/token.module';
 import { TransactionTypeFeatureModule } from './features/transaction_type/transaction-type.module';
 import { UserFeatureModule } from './features/user/user.module';
@@ -34,7 +35,8 @@ import { WalletsByClientsFeatureModule } from './features/wallestByClients/walle
     DecrementFeatureModule,
     WalletsByClientsFeatureModule,
     TransactionTypeFeatureModule,
-    ApplicabilityModule
+    ApplicabilityModule,
+    RoleFeatureModule
 
   ],
 })

@@ -11,4 +11,5 @@ export interface IUserRepository {
   findAll(filter?: FilterQuery<UserModel>): Promise<User[]>;
   findById(id: string): Promise<User>;
   updateQuery(id: string, updateQuery: UpdateQuery<UserModel>): Promise<User>;
+  findOneByParams(param: string): Promise<User>
 }

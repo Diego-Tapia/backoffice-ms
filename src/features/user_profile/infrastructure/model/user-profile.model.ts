@@ -30,6 +30,12 @@ export class UserProfileModel extends Document {
 
   @Prop({ type: Types.ObjectId, ref: UserModel.name })
   userId: Types.ObjectId | UserModel;
+
+  @Prop({})
+  createdAt: Date;
+  
+  @Prop({ })
+  updatedAt: Date;
 }
 
 export const UserProfileSchema = SchemaFactory.createForClass(UserProfileModel);

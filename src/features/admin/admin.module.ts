@@ -6,6 +6,8 @@ import { PassportModule } from "@nestjs/passport";
 import { AdminController } from "src/api/admin/admin.controller";
 import configs from "src/configs/environments/configs";
 import { AdminConfirmProvider } from "./application/admin-confirm/admin-confirm.provider";
+import { GetAdminByClientIdApplicationProvider } from "./application/admin-get-by-client-id/admin-get-by-client-id.provider";
+import { GetAdminByIdApplicationProvider } from "./application/admin-get-by-id/admin-get-by-id.provider";
 import { AdminLoginProvider } from "./application/admin-login/admin-login.provider";
 import { AdminRegisterProvider } from "./application/admin-register/admin-register.provider";
 import { AdminModel, AdminSchema } from "./infrastructure/models/admin.model";
@@ -37,6 +39,8 @@ import { JwtStrategy } from "./infrastructure/service/jwt.strategy";
       AdminLoginProvider,
       AdminRegisterProvider,
       AdminConfirmProvider,
+      GetAdminByClientIdApplicationProvider,
+      GetAdminByIdApplicationProvider,
     ],
     controllers: [AdminController],
     exports: [AdminRepositoryProvider],
