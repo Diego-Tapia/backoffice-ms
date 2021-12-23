@@ -1,0 +1,6 @@
+export enum EUserStatus {
+    ACTIVE = 'ACTIVE',
+    BLOCKED = 'BLOCKED',
+    PENDING_APPROVE = 'PENDING_APPROVE',
+    INACTIVE = 'INACTIVE'
+}

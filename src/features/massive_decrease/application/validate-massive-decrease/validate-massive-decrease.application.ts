@@ -1,6 +1,8 @@
 import { BadRequestException, Inject, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { User } from 'src/features/user/domain/entities/user.entity';
 import { IUserRepository } from 'src/features/user/infrastructure/repositories/user-reposiory.interface';
 import { UserTypes } from 'src/features/user/user.types';
+import { UserProfile } from 'src/features/user_profile/domain/entities/userProfile.entity';
 import { IUserProfileRepository } from 'src/features/user_profile/infrastructure/repositories/user-repository.interface';
 import { UserProfileTypes } from 'src/features/user_profile/user.types';
 import { IBalances } from 'src/features/wallet/domain/interfaces/balances.interface';
@@ -90,24 +92,30 @@ export class ValidateMassiveDecreaseApplication implements IValidateMassiveDecre
 
   private validateBalanceUserWalletAndSetErrorMessage = async (detail: MassiveDecreaseDetail, massiveDecrease: MassiveDecrease): Promise<string[]> => {
     const errorMessage: string[] = [];
+    let userTemp: User;
+    let userProfile: UserProfile
 
-    let userProfile = (typeof detail.userId === 'string') 
-      ? await this.userProfileRepository.findOneQuery({ userId: String(detail.userId) })
-      : null;
-    if (!userProfile && !isNaN(Number(detail.userId))) userProfile = await this.userProfileRepository.findOneQuery({ cuil: Number(detail.userId) });
-    if (!userProfile && !isNaN(Number(detail.userId))) userProfile = await this.userProfileRepository.findOneQuery({ dni: Number(detail.userId) }); 
+    const isNumber = !isNaN(Number(detail.userId)); 
     
-    const user = (userProfile) ? await this.userRepository.findOneQuery({ _id: userProfile.userId }) : null;
+    if (isNumber) {
+      userProfile = await this.userProfileRepository.findOneByParams(+detail.userId)
+    }
+
+    if (!userProfile && !isNumber ) {
+      userTemp = await this.userRepository.findOneByParams(detail.userId as string);
+    }
+    
+    const user =  userTemp || userProfile?.userId as User
     
     if (!user) {
       errorMessage.push('El usuario no existe')
       return errorMessage
     }
-
+    
     if (detail.amount && typeof detail.amount === 'number') {
       const userWallet = await this.walletRepository.findById(user.walletId);
       const balanceUserWalletByTokenId = userWallet.balances
-      .filter((balance: IBalances) => balance.tokenId === massiveDecrease.tokenId)
+      .filter((balance: IBalances) => balance.tokenId.toString() === massiveDecrease.tokenId)
       .map((balance) => balance.amount)
       .reduce((pre, curr) => pre + curr, 0);
       if (balanceUserWalletByTokenId < detail.amount) errorMessage.push('Saldo insuficiente')
