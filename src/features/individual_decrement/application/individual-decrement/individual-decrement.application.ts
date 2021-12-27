@@ -57,6 +57,7 @@ export class IndividualDecrementApplication implements IIndividualDecrementAppli
     
     const user =  userTemp || userProfile?.userId as User
     if (!user) throw new HttpException('USER NOT-FOUND', HttpStatus.NOT_FOUND);
+
     if (!user.walletId) throw new HttpException('THIS USER HAS NO WALLET', HttpStatus.NOT_FOUND);
     userWallet = await this.walletRepository.findById(user.walletId);
     if (!userWallet) throw new HttpException('THIS USER WALLET WAS NOT FOUND', HttpStatus.NOT_FOUND);
