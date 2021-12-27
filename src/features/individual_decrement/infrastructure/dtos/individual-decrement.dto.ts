@@ -11,8 +11,9 @@ export class IndividualDecrementDto {
   @IsNotEmpty()
   public readonly tokenId: string;
   
+  @IsString()
   @IsNotEmpty()
-  public readonly userIdentifier: string | number;
+  public readonly userIdentifier: string;
 
   @IsNumber()
   @IsPositive()

@@ -6,12 +6,11 @@ import { IUserRegisterApplication } from './user-register.app.interface';
 import { IUserRepository } from '../../infrastructure/repositories/user-reposiory.interface';
 import { Register } from '../../domain/entities/user-register.entity';
 import { UserTypes } from '../../user.types';
-import {InjectConnection} from '@nestjs/mongoose';
-import * as mongoose from 'mongoose';
 import { IUserProfileRepository } from 'src/features/user_profile/infrastructure/repositories/user-repository.interface';
 import { UserProfile } from 'src/features/user_profile/domain/entities/userProfile.entity';
 import { WalletTypes } from 'src/features/wallet/wallet.type';
 import { IWalletRepository } from 'src/features/wallet/infrastructure/repositories/wallet-repository.interface';
+import { EUserStatus } from '../../domain/enums/user.status.enum';
 
 
 @Injectable()
@@ -48,7 +47,7 @@ export class UserRegisterApplication implements IUserRegisterApplication {
       const user = new User({
         customId,
         username,
-        status: "ACTIVE",
+        status: EUserStatus.ACTIVE,
         clientId,
         walletId: wallet.id          
       })

@@ -28,6 +28,8 @@ import { Wallet } from 'src/features/wallet/domain/entities/wallet.entity';
 import { QueueEmitterTypes } from 'src/features/queue_emitter/queue-emitter.types';
 import { IQueueEmitterTransactionApplication } from 'src/features/queue_emitter/application/transaction/queue-emitter-transaction-app.interface';
 import { ITransactionQueueMessage } from 'src/features/queue_emitter/domain/interfaces/transaction-queue-message.interface';
+import { User } from 'src/features/user/domain/entities/user.entity';
+import { UserProfile } from 'src/features/user_profile/domain/entities/userProfile.entity';
 
 export class ProcessMassiveIncreaseApplication implements IProcessMassiveIncreaseApplication {
   constructor(
@@ -70,7 +72,7 @@ export class ProcessMassiveIncreaseApplication implements IProcessMassiveIncreas
       if (!mainWallet) throw new BadRequestException(`the wallet with the id "${walletClient.walletId}" not exist`);
 
       const balanceMainWalletByTokenId = mainWallet.balances
-        .filter((balance: IBalances) => balance.tokenId === massiveIncrease.tokenId)
+        .filter((balance: IBalances) => balance.tokenId.toString() === massiveIncrease.tokenId)
         .map((balance) => balance.amount)
         .reduce((pre, curr) => pre + curr, 0);
       if (balanceMainWalletByTokenId < massiveIncrease.totalAmountValidated) throw new BadRequestException('insufficient amount');
@@ -81,14 +83,19 @@ export class ProcessMassiveIncreaseApplication implements IProcessMassiveIncreas
 
         if (detail.status === EMassiveIncreaseDetailStatus.INVALID) continue;
 
-        let userProfile = (typeof detail.userId === 'string') 
-          ? await this.userProfileRepository.findOneQuery({ userId: String(detail.userId) })
-          : null;
-        if (!userProfile && !isNaN(Number(detail.userId))) userProfile = await this.userProfileRepository.findOneQuery({ cuil: Number(detail.userId) });
-        if (!userProfile && !isNaN(Number(detail.userId))) userProfile = await this.userProfileRepository.findOneQuery({ dni: Number(detail.userId) }); 
+        let userTemp: User;
+        let userProfile: UserProfile
+        const isNumber = !isNaN(Number(detail.userId)); 
+    
+        if (isNumber) {
+          userProfile = await this.userProfileRepository.findOneByParams(+detail.userId)
+        }
+
+        if (!userProfile && !isNumber ) {
+          userTemp = await this.userRepository.findOneByParams(detail.userId as string);
+        }
         
-        let user = (userProfile) ? await this.userRepository.findOneQuery({ _id: userProfile.userId }) : null;
-        // TODO si user es null consultar por customId
+        const user =  userTemp || userProfile?.userId as User
         
         if (!user) {
           detail.error.push('El usuario no existe');
@@ -125,7 +132,6 @@ export class ProcessMassiveIncreaseApplication implements IProcessMassiveIncreas
           massiveIncreaseId,
           detailId: detail.id
         }
-  
         this.QueueEmitterTransactionApplication.execute(transactionQueueMessage)
 
       }

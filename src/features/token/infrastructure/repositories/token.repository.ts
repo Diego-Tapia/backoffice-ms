@@ -13,44 +13,44 @@ import { ITokenRepository } from './token-repository.interface';
 export class TokenRepository implements ITokenRepository {
   constructor(
     @InjectModel(TokenModel.name) private readonly tokenModel: Model<TokenModel>
-  ) {}
+  ) { }
 
   public async create(token: Token): Promise<Token> {
-    const saveToken = new this.tokenModel(token)
-    let model = await (await saveToken.save())
-      .populate({path: 'applicabilities'})
-      .populate({path: 'operations'})
-      .execPopulate()
-    return model ? this.toEntityAndPopulate(model) : null
+    const saveToken = new this.tokenModel(token);
+    const savedToken = await saveToken.save();
+    const model = await this.tokenModel
+      .populate(savedToken, [{ path: 'applicabilities' }, { path: 'operations' }]);
+
+    return model ? this.toEntityAndPopulate(model) : null;
   }
 
   public async findAll(filter?: FilterQuery<TokenModel>): Promise<Token[]> {
     const models = await this.tokenModel
       .find(filter)
-      .populate({path: 'applicabilities'})
-      .populate({path: 'operations'})
+      .populate({ path: 'applicabilities' })
+      .populate({ path: 'operations' })
       .exec();
     return models ? models.map(token => this.toEntityAndPopulate(token)) : null;
   }
 
   public async findById(id: string): Promise<Token> {
     const model = await this.tokenModel.findById(id)
-      .populate({path: 'applicabilities'})
-      .populate({path: 'operations'})
+      .populate({ path: 'applicabilities' })
+      .populate({ path: 'operations' })
       .exec();
     return model ? this.toEntityAndPopulate(model) : null;
   }
 
   public async findLastCreated(): Promise<Token> {
-    const model = await this.tokenModel.findOne().sort({createdAt: -1});
+    const model = await this.tokenModel.findOne().sort({ createdAt: -1 });
     return model ? this.toEntity(model) : null;
   }
 
   public async update(id: string, updateQuery: UpdateQuery<any>): Promise<Token> {
     console.log(updateQuery)
-    const model = await this.tokenModel.findByIdAndUpdate(id, {...updateQuery}, {new: true})
-      .populate({path: 'applicabilities'})
-      .populate({path: 'operations'})
+    const model = await this.tokenModel.findByIdAndUpdate(id, { ...updateQuery }, { new: true })
+      .populate({ path: 'applicabilities' })
+      .populate({ path: 'operations' })
       .exec()
     return model ? this.toEntityAndPopulate(model) : null;
   }
@@ -58,8 +58,8 @@ export class TokenRepository implements ITokenRepository {
 
 
 
-  private toEntity(model: TokenModel){
-    const { 
+  private toEntity(model: TokenModel) {
+    const {
       shortName,
       symbol,
       price,
@@ -103,8 +103,8 @@ export class TokenRepository implements ITokenRepository {
     return tokenEntity
   }
 
-  private toEntityAndPopulate(model: TokenModel){
-    const { 
+  private toEntityAndPopulate(model: TokenModel) {
+    const {
       shortName,
       symbol,
       price,
@@ -123,7 +123,7 @@ export class TokenRepository implements ITokenRepository {
       observation,
       _id,
       createdAt,
-      updatedAt 
+      updatedAt
     } = model
     const tokenEntity = new Token({
       id: _id.toString(),
@@ -149,19 +149,19 @@ export class TokenRepository implements ITokenRepository {
     return tokenEntity
   }
 
-  private toEntityApplicability(model: ApplicabilityModel){
-    const { name, description, clientId, _id  } = model
-    const applicabilities = new Applicabilities({ 
-        name, 
-        clientId: clientId.toString(), 
-        description,
-        id: _id
+  private toEntityApplicability(model: ApplicabilityModel) {
+    const { name, description, clientId, _id } = model
+    const applicabilities = new Applicabilities({
+      name,
+      clientId: clientId.toString(),
+      description,
+      id: _id
     })
     return applicabilities;
   }
 
   private toEntityTransactionType(model: TransactionTypeModel) {
-    const {name, description, _id } = model;
+    const { name, description, _id } = model;
     const transactionType = new TransactionType({ name, description, id: _id });
     return transactionType
   }

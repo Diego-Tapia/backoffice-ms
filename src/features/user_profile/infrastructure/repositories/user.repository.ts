@@ -39,11 +39,6 @@ export class UserRepository implements IUserProfileRepository {
     const userModel = await this.userModel.findOne({ ...filter }).exec();
     return userModel ? this.toDomainEntity(userModel) : null;
   }
-  
-  public async findOneUser(username: string): Promise<UserProfile> {
-    const userModel = await this.userModel.findOne({ username: username }).exec();
-    return userModel ? this.toDomainEntity(userModel) : null;
-  }
 
   public async findOneByParams(param: number): Promise<UserProfile> {
     const userModel = await this.userModel

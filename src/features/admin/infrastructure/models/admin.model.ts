@@ -38,6 +38,9 @@ export class AdminModel extends Document {
   // @Prop({ type: Types.ObjectId, ref: RoleModel.name })
   // role: Types.ObjectId;
 
+  // @Prop({ })
+  // status:
+
   @Prop({})
   createdAt: Date;
   

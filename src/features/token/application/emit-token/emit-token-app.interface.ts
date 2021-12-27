@@ -1,5 +1,5 @@
-import { Transaction } from "src/features/transaction/domain/entities/transaction.entity";
+import { RequestModel } from "src/features/admin/infrastructure/service/middleware/admin.middleware";
 
 export interface IEmitTokenApplication {
-  execute(id: string): Promise<Transaction>
+  execute(id: string, request: RequestModel): Promise<void>
 }

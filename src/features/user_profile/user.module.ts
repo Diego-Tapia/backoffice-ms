@@ -8,12 +8,15 @@ import { UserProfileModel, UserProfileSchema } from './infrastructure/model/user
 import { UserProfileController } from 'src/api/user_profile/user-profile.controller';
 import { GetUserProfileByIdApplicationProvider } from './application/get-user-profile-by-id-populate/get-user-profile-by-id.provider';
 import { GetAllUserProfileByClientIdApplicationProvider } from './application/get-all-user-profile-by-client-id/get-all-user-profile-by-client-id.provider';
+import { UserFeatureModule } from '../user/user.module';
+import { ValidateUserApplicationProvider } from './application/validate-user/validate-user.provider';
 
 @Module({
   controllers: [
     UserProfileController
   ],
   imports: [
+    UserFeatureModule,  
     MongooseModule.forFeature([{ name: UserProfileModel.name, schema: UserProfileSchema }])
   ],
   providers: [
@@ -22,7 +25,8 @@ import { GetAllUserProfileByClientIdApplicationProvider } from './application/ge
     GetAllUsersApplicationProvider,
     GetUserByIdApplicationProvider,
     GetUserProfileByIdApplicationProvider,
-    GetAllUserProfileByClientIdApplicationProvider
+    GetAllUserProfileByClientIdApplicationProvider,
+    ValidateUserApplicationProvider
   ],
 })
 export class UserProfileFeatureModule {}

@@ -11,6 +11,5 @@ export interface IUserProfileRepository {
   findByIdAndPopulate(id: string): Promise<UserProfile>;
   findOneQueryAndPopulate(filter: FilterQuery<UserProfileModel>): Promise<UserProfile>
   findAllByClientIdAndPopulate(clientId: string): Promise<UserProfile[]>
-  findOneUser(user: string): Promise<UserProfile>;
   findOneByParams(param: number): Promise<UserProfile>;
 }

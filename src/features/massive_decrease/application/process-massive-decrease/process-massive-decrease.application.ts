@@ -28,6 +28,8 @@ import { Wallet } from 'src/features/wallet/domain/entities/wallet.entity';
 import { QueueEmitterTypes } from 'src/features/queue_emitter/queue-emitter.types';
 import { IQueueEmitterTransactionApplication } from 'src/features/queue_emitter/application/transaction/queue-emitter-transaction-app.interface';
 import { ITransactionQueueMessage } from 'src/features/queue_emitter/domain/interfaces/transaction-queue-message.interface';
+import { User } from 'src/features/user/domain/entities/user.entity';
+import { UserProfile } from 'src/features/user_profile/domain/entities/userProfile.entity';
 
 export class ProcessMassiveDecreaseApplication implements IProcessMassiveDecreaseApplication {
   constructor(
@@ -73,14 +75,20 @@ export class ProcessMassiveDecreaseApplication implements IProcessMassiveDecreas
 
         if (detail.status === EMassiveDecreaseDetailStatus.INVALID) continue;
         
-        let userProfile = (typeof detail.userId === 'string') 
-          ? await this.userProfileRepository.findOneQuery({ userId: String(detail.userId) })
-          : null;
-        if (!userProfile && !isNaN(Number(detail.userId))) userProfile = await this.userProfileRepository.findOneQuery({ cuil: Number(detail.userId) });
-        if (!userProfile && !isNaN(Number(detail.userId))) userProfile = await this.userProfileRepository.findOneQuery({ dni: Number(detail.userId) }); 
+        let userTemp: User;
+        let userProfile: UserProfile
+        const isNumber = !isNaN(Number(detail.userId)); 
+    
+        if (isNumber) {
+          userProfile = await this.userProfileRepository.findOneByParams(+detail.userId)
+        }
+
+        if (!userProfile && !isNumber ) {
+          userTemp = await this.userRepository.findOneByParams(detail.userId as string);
+        }
         
-        const user = (userProfile) ? await this.userRepository.findOneQuery({ _id: userProfile.userId }) : null;
-          
+        const user =  userTemp || userProfile?.userId as User
+
         if (!user) {
           detail.error.push('El usuario no existe');
           detail.status = EMassiveDecreaseDetailStatus.INVALID
@@ -99,7 +107,7 @@ export class ProcessMassiveDecreaseApplication implements IProcessMassiveDecreas
         }
 
         const balanceUserWalletByTokenId = userWallet.balances
-          .filter((balance: IBalances) => balance.tokenId === massiveDecrease.tokenId)
+          .filter((balance: IBalances) => balance.tokenId.toString() === massiveDecrease.tokenId)
           .map((balance) => balance.amount)
           .reduce((pre, curr) => pre + curr, 0);
 

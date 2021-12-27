@@ -50,13 +50,13 @@ export class TokenController {
   }
 
   @Post(':id/emit')
-  emitToken(@Param('id') id: string) {
-    return this.emitTokenApplication.execute(id)
+  emitToken(@Param('id') id: string, @Request() request) {
+    return this.emitTokenApplication.execute(id, request)
   }
   
   @Post(':id/reemit')
-  reemitToken(@Param('id') id: string, @Body() reemitTokenDto: ReemitTokenDto) {
-    return this.reemitTokenApplication.execute(id, reemitTokenDto)
+  reemitToken(@Param('id') id: string, @Body() reemitTokenDto: ReemitTokenDto, @Request() request) {
+    return this.reemitTokenApplication.execute(id, reemitTokenDto, request)
   }
 
 
