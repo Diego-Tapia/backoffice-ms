@@ -1,4 +1,4 @@
-import { FilterQuery } from "mongoose";
+import { FilterQuery, UpdateQuery } from "mongoose";
 import { Admin } from "../../domain/entities/admin.entity";
 import { Confirm } from "../../domain/entities/confirmAdmin.entity";
 import { Login } from "../../domain/entities/loginAd,on.entity";
@@ -17,4 +17,5 @@ export interface IAdminRepository {
   findByDni(dni: number): Promise<Admin>;
   findAll(FilterQuery?: FilterQuery<AdminModel>): Promise<Admin[]>;
   findById(id: string): Promise<Admin>;
+  update(id: string, update: UpdateQuery<any>): Promise<Admin>;
 }

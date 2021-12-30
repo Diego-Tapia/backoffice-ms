@@ -1,4 +1,4 @@
-import { FilterQuery } from "mongoose";
+import { FilterQuery, UpdateQuery } from "mongoose";
 import { UserProfile } from "../../domain/entities/userProfile.entity";
 import { UserProfileModel } from "../model/user-profile.model";
 
@@ -12,4 +12,6 @@ export interface IUserProfileRepository {
   findOneQueryAndPopulate(filter: FilterQuery<UserProfileModel>): Promise<UserProfile>
   findAllByClientIdAndPopulate(clientId: string): Promise<UserProfile[]>
   findOneByParams(param: number): Promise<UserProfile>;
+  update(id: string, update: UpdateQuery<any>): Promise<UserProfile>;
+
 }

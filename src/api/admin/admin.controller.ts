@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Get, Inject, Param, Post, Request } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Inject, Logger, Param, Patch, Post, Put, Request, UsePipes, ValidationError } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AdminTypes } from 'src/features/admin/admin.types';
 import { IAdminConfirmApplication } from 'src/features/admin/application/admin-confirm/admin-confirm-app.interface';
@@ -10,6 +10,9 @@ import { AdminRegisterDTO } from 'src/features/admin/infrastructure/dto/admin-re
 import { AuthResponse } from 'src/features/admin/domain/response/auth.response';
 import { IGetAdminByClientIdApplication } from 'src/features/admin/application/admin-get-by-client-id/admin-get-by-client-id.app.interface';
 import { IGetAdminByIdApplication } from 'src/features/admin/application/admin-get-by-id/admin-get-by-id.app.interface';
+import { UpdateAdminDto } from 'src/features/admin/infrastructure/dto/update-admin.dto';
+import { IAdminUpdateApplication } from 'src/features/admin/application/admin-update/admin-update-app.interface';
+import { ValidationPipe } from '@nestjs/common';
 
 @ApiTags('admin')
 @Controller('admin')
@@ -25,6 +28,8 @@ export class AdminController {
     private readonly getAdminByClientIdApplication: IGetAdminByClientIdApplication,
     @Inject(AdminTypes.APPLICATION.GET_BY_ID)
     private readonly getAdminByIdApplication: IGetAdminByIdApplication,
+    @Inject(AdminTypes.APPLICATION.ADMIN_UPDATE)
+    private readonly adminUpdateApplication: IAdminUpdateApplication,
     
   ) {}
 
@@ -64,5 +69,16 @@ export class AdminController {
   @Get(':id')
   findById(@Param('id') id: string) {
     return this.getAdminByIdApplication.execute(id);
+  }
+
+  @Put(':id')
+  //Con UsePipes y Whitelist:true valida el DTO con PartialTypes y OmitTypes
+  //Sin eso directamente te deja cambiar todos los params
+  @UsePipes(new ValidationPipe({ 
+    whitelist: true,
+    forbidNonWhitelisted: true,
+  }))
+  update(@Param('id') id: string, @Body() updateAdminDto: UpdateAdminDto) {
+    return this.adminUpdateApplication.execute(id, updateAdminDto);
   }
 }

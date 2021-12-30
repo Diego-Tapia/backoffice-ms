@@ -3,7 +3,7 @@ import { ConfigType } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 import { InjectModel } from "@nestjs/mongoose";
 import { AuthenticationDetails, CognitoUser, CognitoUserAttribute, CognitoUserPool } from "amazon-cognito-identity-js";
-import { FilterQuery, Model } from "mongoose";
+import { FilterQuery, Model, UpdateQuery } from "mongoose";
 import configs from "src/configs/environments/configs";
 import { Admin } from "../../domain/entities/admin.entity";
 import { Confirm } from "../../domain/entities/confirmAdmin.entity";
@@ -126,6 +126,13 @@ export class AdminRepository implements IAdminRepository {
   public async create(admin: Admin): Promise<Admin> {
     const savedAdmin = await new this.adminModel(admin).save();
     return this.toDomainEntity(savedAdmin);
+  }
+
+  //Como se usa en token
+  public async update(id: string, updateQuery: UpdateQuery<any>): Promise<Admin> {
+    const model = await this.adminModel.findByIdAndUpdate(id, {...updateQuery}, {new: true})
+      .exec()
+    return model ? this.toDomainEntity(model) : null;
   }
 
 

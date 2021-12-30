@@ -10,6 +10,7 @@ import { GetAdminByClientIdApplicationProvider } from "./application/admin-get-b
 import { GetAdminByIdApplicationProvider } from "./application/admin-get-by-id/admin-get-by-id.provider";
 import { AdminLoginProvider } from "./application/admin-login/admin-login.provider";
 import { AdminRegisterProvider } from "./application/admin-register/admin-register.provider";
+import { AdminUpdateApplicationProvider } from "./application/admin-update/admin-update.provider";
 import { AdminModel, AdminSchema } from "./infrastructure/models/admin.model";
 import { AdminRepositoryProvider } from "./infrastructure/repositories/admin-repository.provider";
 import { JwtStrategy } from "./infrastructure/service/jwt.strategy";
@@ -41,6 +42,7 @@ import { JwtStrategy } from "./infrastructure/service/jwt.strategy";
       AdminConfirmProvider,
       GetAdminByClientIdApplicationProvider,
       GetAdminByIdApplicationProvider,
+      AdminUpdateApplicationProvider,
     ],
     controllers: [AdminController],
     exports: [AdminRepositoryProvider],

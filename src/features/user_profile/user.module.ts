@@ -10,6 +10,8 @@ import { GetUserProfileByIdApplicationProvider } from './application/get-user-pr
 import { GetAllUserProfileByClientIdApplicationProvider } from './application/get-all-user-profile-by-client-id/get-all-user-profile-by-client-id.provider';
 import { UserFeatureModule } from '../user/user.module';
 import { ValidateUserApplicationProvider } from './application/validate-user/validate-user.provider';
+import { UpdateUserApplicationProvider } from './application/update-user/update-user.provider';
+import { UserModel, UserSchema } from '../user/infrastructure/models/user.model';
 
 @Module({
   controllers: [
@@ -17,7 +19,8 @@ import { ValidateUserApplicationProvider } from './application/validate-user/val
   ],
   imports: [
     UserFeatureModule,  
-    MongooseModule.forFeature([{ name: UserProfileModel.name, schema: UserProfileSchema }])
+    MongooseModule.forFeature([{ name: UserProfileModel.name, schema: UserProfileSchema }]),
+    MongooseModule.forFeature([{ name: UserModel.name, schema: UserSchema }])
   ],
   providers: [
     UserProfileRepositoryProvider,
@@ -26,7 +29,8 @@ import { ValidateUserApplicationProvider } from './application/validate-user/val
     GetUserByIdApplicationProvider,
     GetUserProfileByIdApplicationProvider,
     GetAllUserProfileByClientIdApplicationProvider,
-    ValidateUserApplicationProvider
+    ValidateUserApplicationProvider,
+    UpdateUserApplicationProvider,
   ],
 })
 export class UserProfileFeatureModule {}

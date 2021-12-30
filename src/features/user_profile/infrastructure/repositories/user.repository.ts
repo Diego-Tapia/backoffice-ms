@@ -1,18 +1,24 @@
-import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
+import { Injectable, Logger } from '@nestjs/common';
+import { InjectModel, InjectConnection } from '@nestjs/mongoose';
 import { ObjectId } from 'mongodb';
-import { FilterQuery, Model } from 'mongoose';
+import { FilterQuery, Model, UpdateQuery } from 'mongoose';
 import { User } from 'src/features/user/domain/entities/user.entity';
 import { UserModel } from 'src/features/user/infrastructure/models/user.model';
 import { UserProfile } from '../../domain/entities/userProfile.entity';
 import { UserProfileModel } from '../model/user-profile.model';
 import { IUserProfileRepository } from './user-repository.interface';
+import * as mongoose from 'mongoose';
+import { LoggingEnabled } from '@aws-sdk/client-s3';
 
 @Injectable()
 export class UserRepository implements IUserProfileRepository {
   constructor(
     @InjectModel(UserProfileModel.name) 
-    private readonly userModel: Model<UserProfileModel>
+    private readonly userModel: Model<UserProfileModel>,
+    @InjectModel(UserModel.name) 
+    private readonly originalUserModel: Model<UserModel>,
+    @InjectConnection()
+    private readonly connection: mongoose.Connection
   ) { }
 
   public async create(user: UserProfile): Promise<UserProfile> {
@@ -80,6 +86,25 @@ export class UserRepository implements IUserProfileRepository {
       : null;
   }
 
+  public async update(id: string, updateQuery: UpdateQuery<any>): Promise<UserProfile> {
+    const transactionSession = await this.connection.startSession();
+    transactionSession.startTransaction();
+
+    try {
+      await this.originalUserModel.findByIdAndUpdate(id, {...updateQuery}, {new: true})
+      
+      const modelProfile = await this.userModel.findOneAndUpdate({userId: id}, {...updateQuery}, {new: true})
+      .populate({path: 'userId'})
+      .exec()
+      
+      transactionSession.commitTransaction();
+      return modelProfile ? this.toDomainEntityAndPopulate(modelProfile) : null
+
+    } catch(err) {
+      transactionSession.abortTransaction();
+    }
+    transactionSession.endSession();
+  }
 
   private toDomainEntity(model: UserProfileModel):UserProfile{
     const { shortName, lastName, dni, cuil, avatarUrl, email, phoneNumber, userId, _id, createdAt, updatedAt } = model;
