@@ -50,8 +50,8 @@ export class UserProfileRepository implements IUserProfileRepository {
   public async update(filter: FilterQuery<UserProfileModel>, updateQuery: UpdateQuery<UserProfileModel>, options?: PopulateOptions | Array<PopulateOptions>, session?: ClientSession): Promise<UserProfile> {
     const query = await this.userProfileModel.findOneAndUpdate(filter, { ...updateQuery }, { new: true });
 
-    const model = await query.save({ session })
-    if(options) await model.populate(options).execPopulate()
+    let model = await query.save({ session });
+    if (options) model = await this.userProfileModel.populate(model, options);
 
     return model ?  UserProfile.toEntity(model as UserProfileModel) as UserProfile : null;
   }
