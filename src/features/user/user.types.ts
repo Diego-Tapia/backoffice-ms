@@ -1,10 +1,13 @@
 export const UserTypes = {
   APPLICATION: {
-    USER_REGISTER: Symbol('UserRegisterApplication'),
-    USER_GET_ALL_BY_CLIENT_ID: Symbol('UserGetAllByClientIdApplication'),
-    USER_GET_BY_ID: Symbol('UserGetByIdApplication'),
+    REGISTER_USER: Symbol('RegisterUserApplication'),
+    UPDATE_USER: Symbol('UpdateUserApplication'),
+    VALIDATE_USER: Symbol('ValidateUserApplication'),
+    GET_USER_BY_ID: Symbol('GetUserApplication'),
+    GET_ALL_USER: Symbol('GetAllUserApplication'),
   },
   INFRASTRUCTURE: {
-    REPOSITORY: Symbol('UserRepository'),
+    USER_PROFILE_REPOSITORY: Symbol('UserProfileRepository'),
+    USER_REPOSITORY: Symbol('UserRepository'),
   },
 };

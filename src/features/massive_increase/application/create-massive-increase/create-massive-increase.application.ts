@@ -58,7 +58,7 @@ export class CreateMassiveIncreaseApplication implements ICreateMassiveIncreaseA
       })
 
       const saveMassiveIncrease = await this.massiveIncreaseRepository.create(massiveIncrease);
-      return this.validateMassiveIncreaseApplication.execute(saveMassiveIncrease);
+      return this.validateMassiveIncreaseApplication.execute(saveMassiveIncrease, req);
 
     } catch (error) {
       throw new HttpException(error.message, error.status);      

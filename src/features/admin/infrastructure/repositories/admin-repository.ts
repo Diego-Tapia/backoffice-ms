@@ -128,7 +128,6 @@ export class AdminRepository implements IAdminRepository {
     return this.toDomainEntity(savedAdmin);
   }
 
-  //Como se usa en token
   public async update(id: string, updateQuery: UpdateQuery<any>): Promise<Admin> {
     const model = await this.adminModel.findByIdAndUpdate(id, {...updateQuery}, {new: true})
       .exec()

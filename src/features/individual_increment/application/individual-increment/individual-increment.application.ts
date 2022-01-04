@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { Transaction } from "src/features/transaction/domain/entities/transaction.entity";
-import { IUserRepository } from "src/features/user/infrastructure/repositories/user-reposiory.interface";
+import { IUserRepository } from "src/features/user/infrastructure/repositories/user/user-reposiory.interface";
 import { UserTypes } from "src/features/user/user.types";
 import { IndividualIncrementDto } from "../../infrastructure/dtos/individual-increment.dto";
 import { IIndividualIncrementApplication } from "./individual-increment-app.interface";
@@ -14,11 +14,11 @@ import { RequestModel } from "src/features/admin/infrastructure/service/middlewa
 import { Wallet } from "src/features/wallet/domain/entities/wallet.entity";
 import { IQueueEmitterTransactionApplication } from "src/features/queue_emitter/application/transaction/queue-emitter-transaction-app.interface";
 import { QueueEmitterTypes } from "src/features/queue_emitter/queue-emitter.types";
-import { UserProfileTypes } from "src/features/user_profile/user.types";
-import { IUserProfileRepository } from "src/features/user_profile/infrastructure/repositories/user-repository.interface";
-import { UserProfile } from "src/features/user_profile/domain/entities/userProfile.entity";
+import { UserProfile } from "src/features/user/domain/entities/user-profile.entity";
 import { User } from "src/features/user/domain/entities/user.entity";
 import { IBalances } from "src/features/wallet/domain/interfaces/balances.interface";
+import { IUserProfileRepository } from "src/features/user/infrastructure/repositories/user-profile/user-profile-repository.interface";
+import { IValidateUserApplication } from "src/features/user/application/validate-user/validate-user-app.interface";
 
 @Injectable()
 export class IndividualIncrementApplication implements IIndividualIncrementApplication {
@@ -30,43 +30,32 @@ export class IndividualIncrementApplication implements IIndividualIncrementAppli
     private readonly walletByClientRepository: IWalletsByClientsRepository,
     @Inject(WalletTypes.APPLICATION.GET_BALANCES)
     private readonly getBalances: IGetBalancesApplication,
-    @Inject(UserTypes.INFRASTRUCTURE.REPOSITORY)
+    @Inject(UserTypes.APPLICATION.VALIDATE_USER)
+    private readonly validateUserApplication: IValidateUserApplication,
+    @Inject(UserTypes.INFRASTRUCTURE.USER_REPOSITORY)
     private readonly userRepository: IUserRepository,
-    @Inject(UserProfileTypes.INFRASTRUCTURE.REPOSITORY)
-    private readonly userProfileRepository : IUserProfileRepository,
     @Inject(QueueEmitterTypes.APPLICATION.EMITTER_TRANSACTION)
     private readonly QueueEmitterTransactionApplication: IQueueEmitterTransactionApplication,
   ) { }
 
   async execute({userIdentifier, amount, tokenId, notes}: IndividualIncrementDto, request: RequestModel) {
     const { clientId } = request.admin;
-    let userTemp: User;
-    let userProfile: UserProfile
-    const isNumber = !isNaN(Number(userIdentifier)); 
     let userWallet: Wallet;
     let mainWallet: Wallet;
-    //USER
-    if (isNumber) {
-      userProfile = await this.userProfileRepository.findOneByParams(+userIdentifier)
-    }
 
-    if (!userProfile && !isNumber ) {
-      userTemp = await this.userRepository.findOneByParams(userIdentifier as string);
-    }
-    
-    const user =  userTemp || userProfile?.userId as User
+    const userProfile = await this.validateUserApplication.execute(userIdentifier, request);
+    const user = userProfile?.userId as User
 
     if (!user) throw new HttpException('USER NOT-FOUND', HttpStatus.NOT_FOUND);
     
     if (!user.walletId) {
-      
       // TODO CREAR WALLET DESDE API BLOCKCHAIN-MS
       // userWallet = await this.blockchainWalletService.create();
       userWallet = await this.walletRepository.create()
-      await this.userRepository.updateQuery(user.id, { walletId: userWallet.id });
-      
+      await this.userRepository.update({ _id: user.id }, { walletId: userWallet.id });
     }
-    else userWallet = await this.walletRepository.findById(user.walletId);
+    else userWallet = await this.walletRepository.findById(user.walletId as string);
+    
     if (!userWallet) throw new HttpException('THIS USER WALLET WAS NOT FOUND', HttpStatus.NOT_FOUND);
     //ADMIN
     const clientWallet = await this.walletByClientRepository.findOne({ clientId: clientId })

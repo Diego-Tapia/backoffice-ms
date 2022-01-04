@@ -6,7 +6,6 @@ import { QueueEmitterFeatureModule } from '../queue_emitter/queue-emitter.module
 import { BlockchainModule } from '../shared/blockchain/infrastructure/service/blockchain.module';
 import { LibrariesModule } from '../shared/libraries/libraries.module';
 import { UserFeatureModule } from '../user/user.module';
-import { UserProfileFeatureModule } from '../user_profile/user.module';
 import { WalletsByClientsFeatureModule } from '../wallestByClients/walletsByClients.module';
 import { WalletFeatureModule } from '../wallet/wallet.module';
 import { CancelMassiveDecreaseApplicationProvider } from './application/cancel-massive-decrease/cancel-massive-decrease.provider';
@@ -28,7 +27,6 @@ import { MassiveDecreaseRepositoryProvider } from './infrastructure/repositories
     WalletsByClientsFeatureModule,
     WalletFeatureModule,
     UserFeatureModule,
-    UserProfileFeatureModule,
     BlockchainModule,
     QueueEmitterFeatureModule,
     forwardRef(() => MassiveIncreaseFeatureModule),

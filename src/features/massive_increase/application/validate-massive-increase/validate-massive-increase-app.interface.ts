@@ -3,5 +3,5 @@ import { MassiveIncrease } from '../../domain/entities/massive-increase.entity';
 import { MassiveIncreaseDto } from '../../infrastructure/dtos/massive-increase.dto';
 
 export interface IValidateMassiveIncreaseApplication {
-  execute(massiveIncrease: MassiveIncrease): Promise<MassiveIncrease>;
+  execute(massiveIncrease: MassiveIncrease, req: RequestModel): Promise<MassiveIncrease>;
 }

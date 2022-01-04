@@ -14,7 +14,6 @@ import { RoleFeatureModule } from './features/role/role.module';
 import { TokenFeatureModule } from './features/token/token.module';
 import { TransactionTypeFeatureModule } from './features/transaction_type/transaction-type.module';
 import { UserFeatureModule } from './features/user/user.module';
-import { UserProfileFeatureModule } from './features/user_profile/user.module';
 import { WalletsByClientsFeatureModule } from './features/wallestByClients/walletsByClients.module';
 
 @Module({

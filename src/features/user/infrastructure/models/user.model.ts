@@ -18,10 +18,10 @@ export class UserModel extends Document {
   status: string;
 
   @Prop({ type: Types.ObjectId, ref: ClientModel.name })
-  clientId: Types.ObjectId;
+  clientId: Types.ObjectId | ClientModel;
 
   @Prop({ type: Types.ObjectId, ref: WalletModel.name })
-  walletId?: Types.ObjectId;
+  walletId?: Types.ObjectId | WalletModel;
 }
 
 export const UserSchema = SchemaFactory.createForClass(UserModel);

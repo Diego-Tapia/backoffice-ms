@@ -10,13 +10,10 @@ import { IProcessMassiveIncreaseApplication } from './process-massive-increase-a
 import { WalletTypes } from 'src/features/wallet/wallet.type';
 import { IWalletRepository } from 'src/features/wallet/infrastructure/repositories/wallet-repository.interface';
 import { IWalletsByClientsRepository } from 'src/features/wallestByClients/infrastructure/repositories/walletsByClients-repository.interface';
-import { IBalances } from 'src/features/wallet/domain/interfaces/balances.interface';
 import { Transaction } from 'src/features/transaction/domain/entities/transaction.entity';
 import { ETransactionTypes } from 'src/features/transaction_type/domain/enums/transaction-types.enum';
 import { UserTypes } from 'src/features/user/user.types';
-import { IUserRepository } from 'src/features/user/infrastructure/repositories/user-reposiory.interface';
-import { UserProfileTypes } from 'src/features/user_profile/user.types';
-import { IUserProfileRepository } from 'src/features/user_profile/infrastructure/repositories/user-repository.interface';
+import { IUserRepository } from 'src/features/user/infrastructure/repositories/user/user-reposiory.interface';
 import { BlockchainTypes } from 'src/features/shared/blockchain/infrastructure/service/blockchain.types';
 import { EMassiveIncreaseDetailStatus } from '../../domain/enums/massive.increase-detail-status.enum';
 import { MassiveDecrease } from 'src/features/massive_decrease/domain/entities/massive-decrease.entity';
@@ -29,7 +26,7 @@ import { QueueEmitterTypes } from 'src/features/queue_emitter/queue-emitter.type
 import { IQueueEmitterTransactionApplication } from 'src/features/queue_emitter/application/transaction/queue-emitter-transaction-app.interface';
 import { ITransactionQueueMessage } from 'src/features/queue_emitter/domain/interfaces/transaction-queue-message.interface';
 import { User } from 'src/features/user/domain/entities/user.entity';
-import { UserProfile } from 'src/features/user_profile/domain/entities/userProfile.entity';
+import { IValidateUserApplication } from 'src/features/user/application/validate-user/validate-user-app.interface';
 
 export class ProcessMassiveIncreaseApplication implements IProcessMassiveIncreaseApplication {
   constructor(
@@ -41,10 +38,10 @@ export class ProcessMassiveIncreaseApplication implements IProcessMassiveIncreas
     private readonly walletsByClientsRepository: IWalletsByClientsRepository,
     @Inject(WalletTypes.INFRASTRUCTURE.REPOSITORY)
     private readonly walletRepository: IWalletRepository,
-    @Inject(UserTypes.INFRASTRUCTURE.REPOSITORY)
+    @Inject(UserTypes.INFRASTRUCTURE.USER_REPOSITORY)
     private readonly userRepository: IUserRepository,
-    @Inject(UserProfileTypes.INFRASTRUCTURE.REPOSITORY)
-    private readonly userProfileRepository:IUserProfileRepository,
+    @Inject(UserTypes.APPLICATION.VALIDATE_USER)
+    private readonly validateUserApplication: IValidateUserApplication,
     @Inject(BlockchainTypes.INFRASTRUCTURE.WALLET)
     private readonly blockchainWalletService: IBlockhainWalletServices,
     @Inject(QueueEmitterTypes.APPLICATION.EMITTER_TRANSACTION)
@@ -71,48 +68,36 @@ export class ProcessMassiveIncreaseApplication implements IProcessMassiveIncreas
       const mainWallet = await this.walletRepository.findById(walletClient.walletId);
       if (!mainWallet) throw new BadRequestException(`the wallet with the id "${walletClient.walletId}" not exist`);
 
-      const balanceMainWalletByTokenId = mainWallet.balances
-        .filter((balance: IBalances) => balance.tokenId.toString() === massiveIncrease.tokenId)
-        .map((balance) => balance.amount)
-        .reduce((pre, curr) => pre + curr, 0);
-      if (balanceMainWalletByTokenId < massiveIncrease.totalAmountValidated) throw new BadRequestException('insufficient amount');
+      if (!mainWallet.hasEnoughFunds(massiveIncrease.tokenId, massiveIncrease.totalAmountValidated)) {
+        throw new BadRequestException('Saldo insuficiente');
+      } 
       
       massiveIncrease = await this.massiveIncreaseRepository.update(massiveIncreaseId, { status: EMassiveIncreaseStatus.PROCESSING })
 
       for (let detail of massiveIncrease.detail) {
 
         if (detail.status === EMassiveIncreaseDetailStatus.INVALID) continue;
-
-        let userTemp: User;
-        let userProfile: UserProfile
-        const isNumber = !isNaN(Number(detail.userId)); 
-    
-        if (isNumber) {
-          userProfile = await this.userProfileRepository.findOneByParams(+detail.userId)
-        }
-
-        if (!userProfile && !isNumber ) {
-          userTemp = await this.userRepository.findOneByParams(detail.userId as string);
-        }
         
-        const user =  userTemp || userProfile?.userId as User
+        let userWallet: Wallet;
         
-        if (!user) {
-          detail.error.push('El usuario no existe');
+        try {
+          const userProfile = await this.validateUserApplication.execute(String(detail.userId), req);
+          const user = userProfile?.userId as User
+
+          if(!user.walletId){
+            userWallet = await this.blockchainWalletService.create();
+            await this.userRepository.update({_id: user.id}, { walletId: userWallet.id });
+          }else{
+            userWallet = await this.walletRepository.findById(user.walletId as string);
+          }
+
+        } catch (error) {
+          detail.error.push(error.message);
           detail.status = EMassiveIncreaseDetailStatus.INVALID
           massiveIncrease.recordLengthValidatedOk--;
           massiveIncrease.recordLengthValidatedError++;
           massiveIncrease.totalAmountValidated - detail.amount
-          continue;
-        }
-
-        
-        let userWallet: Wallet;
-        if(!user.walletId){
-          userWallet = await this.blockchainWalletService.create();
-          await this.userRepository.updateQuery(user.id, { walletId: userWallet.id });
-        }else{
-          userWallet = await this.walletRepository.findById(user.walletId);
+          continue
         }
 
         const transaction = new Transaction({
@@ -132,14 +117,11 @@ export class ProcessMassiveIncreaseApplication implements IProcessMassiveIncreas
           massiveIncreaseId,
           detailId: detail.id
         }
-        this.QueueEmitterTransactionApplication.execute(transactionQueueMessage)
 
+        this.QueueEmitterTransactionApplication.execute(transactionQueueMessage)
       }
       
-      if(massiveIncrease.recordLengthValidatedOk === 0) {
-        await this.massiveIncreaseRepository.update(massiveIncreaseId, { status: EMassiveIncreaseStatus.INVALID })
-      }
-
+      if (massiveIncrease.recordLengthValidatedOk === 0) massiveIncrease.status = EMassiveIncreaseStatus.INVALID
       return await this.massiveIncreaseRepository.update(massiveIncreaseId, massiveIncrease);  
       
     } catch (error) {
