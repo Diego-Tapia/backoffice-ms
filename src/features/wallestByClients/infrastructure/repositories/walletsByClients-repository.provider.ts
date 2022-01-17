@@ -1,8 +1,7 @@
-import { WalletsByClientsTypes } from "../../walletsByClients.types";
-import { WalletsByClientsRepository } from "./walletsByClients-repository";
+import { WalletsByClientsTypes } from "../../walletsByclients.types";
+import { WalletsByClientsRepository } from "./walletsByClients.repository";
 
 export const WalletsByClientsRepositoryProvider = {
-    provide: WalletsByClientsTypes.INFRASTRUCTURE.REPOSITORY,
-    useClass: WalletsByClientsRepository,
-  };
-  
+  provide: WalletsByClientsTypes.INFRASTRUCTURE.REPOSITORY,
+  useClass: WalletsByClientsRepository,
+};

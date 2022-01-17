@@ -45,12 +45,12 @@ export class Client {
     this.id = id;
   }
 
-  static toEntity(model: ClientModel) {
+  static toEntity(model: ClientModel): Client | string {
     const { name, cuit, businessName, responsible, phoneNumber, email, status, industry, _id} = model;
 
     const isString = typeof model === 'string';
-    if (isString) return model; 
-
+    if (isString) return String(model); 
+    
     const clientEntity = new Client({
       name,
       cuit,

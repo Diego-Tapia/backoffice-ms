@@ -3,7 +3,6 @@ import { ConfigType } from "@nestjs/config";
 import { AxiosInstance } from "axios";
 import configs from "src/configs/environments/configs";
 import { LibrariesTypes } from "src/features/shared/libraries/libraries.types";
-import { Token } from "src/features/token/domain/entities/token.entity";
 import { AxiosException } from "../errors/axios.exception";
 import { IBlockchainTokenService } from "./blockchain-token-service.interface";
 

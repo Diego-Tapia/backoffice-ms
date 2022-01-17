@@ -67,8 +67,8 @@ export class AdminController {
   }
 
   @Get(':id')
-  findById(@Param('id') id: string) {
-    return this.getAdminByIdApplication.execute(id);
+  findById(@Param('id') id: string, @Request() request) {
+    return this.getAdminByIdApplication.execute(id, request);
   }
 
   @Put(':id')
@@ -78,7 +78,7 @@ export class AdminController {
     whitelist: true,
     forbidNonWhitelisted: true,
   }))
-  update(@Param('id') id: string, @Body() updateAdminDto: UpdateAdminDto) {
-    return this.adminUpdateApplication.execute(id, updateAdminDto);
+  update(@Param('id') id: string, @Body() updateAdminDto: UpdateAdminDto, @Request() request) {
+    return this.adminUpdateApplication.execute(id, updateAdminDto, request);
   }
 }

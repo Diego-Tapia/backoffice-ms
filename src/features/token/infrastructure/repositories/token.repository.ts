@@ -1,10 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { FilterQuery, Model, UpdateQuery } from 'mongoose';
-import { Applicabilities } from 'src/features/applicability/domain/entities/applicabilities.entity';
-import { ApplicabilityModel } from 'src/features/applicability/infrastructure/models/applicability.model';
-import { TransactionType } from 'src/features/transaction_type/domain/entities/transaction-type.entity';
-import { TransactionTypeModel } from 'src/features/transaction_type/infrastructure/models/transaction-type.model';
+import { ClientSession, FilterQuery, Model, PopulateOptions, UpdateQuery } from 'mongoose';
 import { Token } from '../../domain/entities/token.entity';
 import { TokenModel } from '../models/token.model';
 import { ITokenRepository } from './token-repository.interface';
@@ -15,154 +11,54 @@ export class TokenRepository implements ITokenRepository {
     @InjectModel(TokenModel.name) private readonly tokenModel: Model<TokenModel>
   ) { }
 
-  public async create(token: Token): Promise<Token> {
+  public async create(token: Token,  options?: PopulateOptions | Array<PopulateOptions>): Promise<Token> {
     const saveToken = new this.tokenModel(token);
-    const savedToken = await saveToken.save();
-    const model = await this.tokenModel
-      .populate(savedToken, [{ path: 'applicabilities' }, { path: 'operations' }]);
 
-    return model ? this.toEntityAndPopulate(model) : null;
+    let model = await saveToken.save();
+    if(options) model = await this.tokenModel.populate(model, options);
+
+    return model ? Token.toEntity(model) as Token : null;
   }
 
-  public async findAll(filter?: FilterQuery<TokenModel>): Promise<Token[]> {
-    const models = await this.tokenModel
-      .find(filter)
-      .populate({ path: 'applicabilities' })
-      .populate({ path: 'operations' })
-      .exec();
-    return models ? models.map(token => this.toEntityAndPopulate(token)) : null;
+  public async update(filter: FilterQuery<TokenModel>, updateQuery: UpdateQuery<TokenModel>, options?: PopulateOptions | Array<PopulateOptions>, session?: ClientSession): Promise<Token> {
+    const query = await this.tokenModel.findOneAndUpdate(filter, { ...updateQuery }, { new: true });
+    
+    let model = await query.save({ session });
+    if(options) model = await this.tokenModel.populate(model, options);
+  
+    return model ? Token.toEntity(model as TokenModel) as Token : null;
   }
 
-  public async findById(id: string): Promise<Token> {
-    const model = await this.tokenModel.findById(id)
-      .populate({ path: 'applicabilities' })
-      .populate({ path: 'operations' })
-      .exec();
-    return model ? this.toEntityAndPopulate(model) : null;
+  public async findById(id: string, options?: PopulateOptions | Array<PopulateOptions>): Promise<Token> {
+    const query = this.tokenModel.findById(id);
+
+    if(options) query.populate(options);
+    const model = await query.lean().exec();
+
+    return model ? Token.toEntity(model as TokenModel) as Token : null;
+  }
+
+  async findOne(filter: FilterQuery<TokenModel>, options?: PopulateOptions | Array<PopulateOptions>): Promise<Token> {
+    const query = this.tokenModel.findOne(filter);
+
+    if(options) query.populate(options);
+    const model = await query.lean().exec();
+
+    return model ? Token.toEntity(model as TokenModel) as Token : null;
+  }
+
+  public async findAll(filter?: FilterQuery<TokenModel>, options?: PopulateOptions | Array<PopulateOptions>): Promise<Token[]> {
+    const query = this.tokenModel.find(filter);
+
+    if(options) query.populate(options);
+    const models = await query.sort({ createdAt: -1 }).lean().exec();
+
+    return models.map((model) => Token.toEntity(model as TokenModel) as Token);
   }
 
   public async findLastCreated(): Promise<Token> {
     const model = await this.tokenModel.findOne().sort({ createdAt: -1 });
-    return model ? this.toEntity(model) : null;
+    return model ? Token.toEntity(model) as Token  : null;
   }
 
-  public async update(id: string, updateQuery: UpdateQuery<any>): Promise<Token> {
-    console.log(updateQuery)
-    const model = await this.tokenModel.findByIdAndUpdate(id, { ...updateQuery }, { new: true })
-      .populate({ path: 'applicabilities' })
-      .populate({ path: 'operations' })
-      .exec()
-    return model ? this.toEntityAndPopulate(model) : null;
-  }
-
-
-
-
-  private toEntity(model: TokenModel) {
-    const {
-      shortName,
-      symbol,
-      price,
-      money,
-      status,
-      bcItemId,
-      emited,
-      applicabilities,
-      operations,
-      clientId,
-      description,
-      validFrom,
-      validTo,
-      initialAmount,
-      transferable,
-      observation,
-      _id,
-      createdAt,
-      updatedAt } = model
-    const tokenEntity = new Token({
-      id: _id.toString(),
-      shortName,
-      symbol,
-      price,
-      money,
-      status,
-      bcItemId,
-      emited,
-      applicabilities: applicabilities.map(applicability => applicability.toString()),
-      operations: operations.map(operation => operation.toString()),
-      clientId: clientId.toString(),
-      description,
-      validFrom,
-      validTo,
-      initialAmount,
-      transferable,
-      observation,
-      createdAt,
-      updatedAt
-    })
-    return tokenEntity
-  }
-
-  private toEntityAndPopulate(model: TokenModel) {
-    const {
-      shortName,
-      symbol,
-      price,
-      money,
-      status,
-      bcItemId,
-      emited,
-      applicabilities,
-      operations,
-      clientId,
-      description,
-      validFrom,
-      validTo,
-      initialAmount,
-      transferable,
-      observation,
-      _id,
-      createdAt,
-      updatedAt
-    } = model
-    const tokenEntity = new Token({
-      id: _id.toString(),
-      shortName,
-      symbol,
-      price,
-      money,
-      status,
-      bcItemId,
-      emited,
-      applicabilities: applicabilities.map((applicability: any) => this.toEntityApplicability(applicability)),
-      operations: operations.map((operation: any) => this.toEntityTransactionType(operation)),
-      clientId: clientId.toString(),
-      description,
-      validFrom,
-      validTo,
-      initialAmount,
-      transferable,
-      observation,
-      createdAt,
-      updatedAt
-    })
-    return tokenEntity
-  }
-
-  private toEntityApplicability(model: ApplicabilityModel) {
-    const { name, description, clientId, _id } = model
-    const applicabilities = new Applicabilities({
-      name,
-      clientId: clientId.toString(),
-      description,
-      id: _id
-    })
-    return applicabilities;
-  }
-
-  private toEntityTransactionType(model: TransactionTypeModel) {
-    const { name, description, _id } = model;
-    const transactionType = new TransactionType({ name, description, id: _id });
-    return transactionType
-  }
 }

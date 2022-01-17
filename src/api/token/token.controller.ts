@@ -3,7 +3,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { ICreateTokenApplication } from 'src/features/token/application/create-token/create-token-app.interface';
 import { IEmitTokenApplication } from 'src/features/token/application/emit-token/emit-token-app.interface';
 import { IGetAllTokensApplication } from 'src/features/token/application/get-all-tokens/get-all-tokens-app.interface';
-import { IGetTokenByIdApplication } from 'src/features/token/application/get-token-by-id/get-token-by-id-app.interface';
+import { IGetTokenApplication } from 'src/features/token/application/get-token/get-token-app.interface';
 import { IReemitTokenApplication } from 'src/features/token/application/reemit-token/reemit-token-app.interface';
 import { IUpdateTokenApplication } from 'src/features/token/application/update-token/update-token-app.interface';
 import { ReemitTokenDto } from 'src/features/token/infrastructure/dtos/reemit-token.dto';
@@ -21,8 +21,8 @@ export class TokenController {
     private readonly updateTokenApplication: IUpdateTokenApplication,
     @Inject(TokenTypes.APPLICATION.GET_ALL_TOKENS)
     private readonly getAllTokensApplication: IGetAllTokensApplication,
-    @Inject(TokenTypes.APPLICATION.GET_TOKEN_BY_ID)
-    private readonly getTokenByIdApplication: IGetTokenByIdApplication,
+    @Inject(TokenTypes.APPLICATION.GET_TOKEN)
+    private readonly getTokenApplication: IGetTokenApplication,
     @Inject(TokenTypes.APPLICATION.EMIT_TOKEN)
     private readonly emitTokenApplication: IEmitTokenApplication,
     @Inject(TokenTypes.APPLICATION.REEMIT_TOKEN)
@@ -45,8 +45,8 @@ export class TokenController {
   }
 
   @Get(':id')
-  findById(@Param('id') id: string) {
-    return this.getTokenByIdApplication.execute(id);
+  findById(@Param('id') id: string, @Request() request) {
+    return this.getTokenApplication.execute(id, request);
   }
 
   @Post(':id/emit')

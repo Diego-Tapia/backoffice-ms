@@ -1,5 +1,7 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Inject, Request } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import { IGetAllBalancesApplication } from 'src/features/wallet/application/get-all-balances/get-all-balances-app.interface';
+import { WalletTypes } from 'src/features/wallet/wallet.type';
 import { CreateWalletDto } from '../../features/wallet/infrastructure/dtos/create-wallet.dto';
 import { UpdateWalletDto } from '../../features/wallet/infrastructure/dtos/update-wallet.dto';
 
@@ -7,14 +9,20 @@ import { UpdateWalletDto } from '../../features/wallet/infrastructure/dtos/updat
 @Controller('wallet')
 export class WalletController {
 
+  constructor(
+    @Inject(WalletTypes.APPLICATION.GET_ALL_BALANCES)
+    private readonly getAllBalancesApplication: IGetAllBalancesApplication
+  ) {}
+
+
   @Post()
   create(@Body() createWalletDto: CreateWalletDto) {
     return
   }
 
   @Get()
-  findAll() {
-    return
+  findAll(@Request() req) {
+    return this.getAllBalancesApplication.execute(req)
   }
 
   @Get(':id')

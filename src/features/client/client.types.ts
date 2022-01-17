@@ -5,6 +5,6 @@ export const ClientTypes = {
     GET_CLIENT_BY_ID: Symbol(''),
   },
   INFRASTRUCTURE: {
-    REPOSITORY: Symbol(''),
+    REPOSITORY: Symbol('ClientRepository'),
   },
 };

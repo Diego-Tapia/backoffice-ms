@@ -1,23 +1,17 @@
 import { HttpException, HttpStatus, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { BlockchainTypes } from 'src/features/shared/blockchain/infrastructure/service/blockchain.types';
 import { IBlockchainTokenService } from 'src/features/shared/blockchain/infrastructure/service/token/blockchain-token-service.interface';
-import { IBlockchainTransactionService } from 'src/features/shared/blockchain/infrastructure/service/transaction/blockchain-transaction-service.interface';
 import { ETokenStatus } from 'src/features/token/domain/enums/token-status.enum';
-import { ETransactionTypes } from 'src/features/transaction_type/domain/enums/transaction-types.enum';
-import { Transaction } from 'src/features/transaction/domain/entities/transaction.entity';
-
 import { Token } from '../../domain/entities/token.entity';
 import { ITokenRepository } from '../../infrastructure/repositories/token-repository.interface';
 import { TokenTypes } from '../../token.types';
 import { IEmitTokenApplication } from './emit-token-app.interface';
 import { RequestModel } from 'src/features/admin/infrastructure/service/middleware/admin.middleware';
 import { IWalletsByClientsRepository } from 'src/features/wallestByClients/infrastructure/repositories/walletsByClients-repository.interface';
-import { WalletsByClientsTypes } from 'src/features/wallestByClients/walletsByClients.types';
+import { WalletsByClientsTypes } from 'src/features/wallestByClients/walletsByclients.types';
 import { Wallet } from 'src/features/wallet/domain/entities/wallet.entity';
 import { IWalletRepository } from 'src/features/wallet/infrastructure/repositories/wallet-repository.interface';
 import { WalletTypes } from 'src/features/wallet/wallet.type';
-import { IQueueEmitterTransactionApplication } from 'src/features/queue_emitter/application/transaction/queue-emitter-transaction-app.interface';
-import { QueueEmitterTypes } from 'src/features/queue_emitter/queue-emitter.types';
 
 @Injectable()
 export class EmitTokenApplication implements IEmitTokenApplication {
@@ -46,13 +40,13 @@ export class EmitTokenApplication implements IEmitTokenApplication {
 
     const clientWallet = await this.walletByClientRepository.findOne({ clientId: clientId })
     if (!clientWallet) throw new NotFoundException("Wallet id de cliente no encontrada.");
-    this.mainWallet = await this.walletRepository.findById(clientWallet.walletId);
+    this.mainWallet = await this.walletRepository.findById(clientWallet.walletId as string);
     if (!this.mainWallet) throw new NotFoundException("Wallet de cliente no encontrada.");
 
     await this.blockchainTokenService.emitToken(token.id, request.admin.id, token.initialAmount)
     
     try {
-      await this.tokenRepository.update(id, { emited: true });
+      await this.tokenRepository.update({_id: id}, { emited: true });
     } catch (error) {
       throw new HttpException('Error actualizando el estado del token', HttpStatus.INTERNAL_SERVER_ERROR)      
     }

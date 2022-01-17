@@ -1,4 +1,4 @@
-import { WalletsByClientsTypes } from "../../walletsByClients.types";
+import { WalletsByClientsTypes } from "../../walletsByclients.types";
 import { GetAllWalletsByClientsApplication } from "./get-all-walletsByClients.application";
 
 

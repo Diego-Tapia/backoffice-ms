@@ -14,7 +14,7 @@ export class ApplicabilityModel extends Document {
   description: string;
 
   @Prop({type: Types.ObjectId, ref: ClientModel.name })
-  clientId: Types.ObjectId;
+  clientId: Types.ObjectId | ClientModel;
 
 }
 

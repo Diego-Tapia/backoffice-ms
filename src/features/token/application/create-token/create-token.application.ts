@@ -16,7 +16,8 @@ export class CreateTokenApplication implements ICreateTokenApplication {
 
   public async execute(createTokenDto: CreateTokenDto, req: RequestModel): Promise<Token> {
     const { clientId } = req.admin;
-    const validateUniqueValues = await this.validateUniqueValuesByClientId(clientId, createTokenDto);
+    
+    const validateUniqueValues = await this.validateUniqueValues(clientId, createTokenDto);
     if(validateUniqueValues) throw new BadRequestException(validateUniqueValues)
     
     try {
@@ -28,23 +29,29 @@ export class CreateTokenApplication implements ICreateTokenApplication {
         status: ETokenStatus.INACTIVE,
         clientId,
       })
-      return this.tokenRepository.create(token)
+      return this.tokenRepository.create(
+        token,
+        [ { path: 'applicabilities' }, { path: 'operations' }]
+      )
     } catch (error) {
       throw new HttpException(error, error.status);
     }
   }
 
-  private async validateUniqueValuesByClientId(clientId: string, createTokenDto: CreateTokenDto): Promise<String[]> {
+  private async validateUniqueValues(clientId: string, createTokenDto: CreateTokenDto): Promise<String[]> {
     const { shortName, symbol } = createTokenDto;
     let errorMessage: string[] = [];
+
     try {
-      const tokens = await this.tokenRepository.findAll({clientId});
-      const symbolExsit = tokens.filter(token => token.symbol === symbol).length > 0; 
-      const shortNameExsit = tokens.filter(token => token.shortName === shortName).length > 0; 
-      
-      if( symbolExsit ) errorMessage.push('symbol already exists.');
-      if( shortNameExsit ) errorMessage.push('shortName already exists.');
-      return (errorMessage.length > 0) ? errorMessage : null;
+      const token = await this.tokenRepository.findOne(
+        { $and: [ { clientId }, { $or: [ { shortName }, { symbol } ] } ] }
+      );
+
+      if(token?.symbol === symbol) errorMessage.push('El symbol ya se ecuentra en uso.');
+      if(token?.shortName === shortName ) errorMessage.push('El shorName ya se ecuentra en uso');
+
+      return (errorMessage.length) ? errorMessage : null;
+
     } catch (error) {
       throw new HttpException(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }

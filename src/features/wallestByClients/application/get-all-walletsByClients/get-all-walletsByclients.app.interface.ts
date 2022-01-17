@@ -1,5 +1,4 @@
-import { WalletsByClients } from "../../domain/walletsByClients.entity";
+import { WalletsByClients } from '../../domain/walletsByclients.entity';
 export interface IGetAllWalletsByClientsApplication {
-    execute(): Promise<WalletsByClients[]>;
-  }
-  
+  execute(): Promise<WalletsByClients[]>;
+}

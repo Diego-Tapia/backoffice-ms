@@ -38,8 +38,8 @@ export class UserController {
   ) {}
 
   @Get(':id')
-  findById(@Param('id') id: string) {
-    return this.getUserByIdApplication.execute(id)
+  findById(@Param('id') id: string, @Request() request) {
+    return this.getUserByIdApplication.execute(id, request)
   }
 
   @Get()
@@ -65,7 +65,7 @@ export class UserController {
   // Sin eso directamente te deja cambiar todos los params
   @Put(':id')
   @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.updateUser.execute(id, updateUserDto);
+  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto, @Request() request) {
+    return this.updateUser.execute(id, updateUserDto, request);
   }
 }

@@ -14,7 +14,10 @@ export class GetAllTokensApplication implements IGetAllTokensApplication {
 
   public execute(req: RequestModel): Promise<Token[]> {
     const { clientId } = req.admin;
-    return this.tokenRepository.findAll({clientId});
+    return this.tokenRepository.findAll(
+      {clientId},
+      [ { path: 'applicabilities' }, { path: 'operations' }]
+    );
   }
 }
 

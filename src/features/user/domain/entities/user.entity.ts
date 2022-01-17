@@ -31,11 +31,13 @@ export class User {
   }
   
   static toEntity(model: UserModel): User | string {
+
+    if (!model) return null;
+
     const { customId, username, status, _id, clientId, walletId } = model;
     
     const isString = typeof model === 'string';
     if (isString) return String(model); 
-
 
     const userEntity = new User({
       customId,

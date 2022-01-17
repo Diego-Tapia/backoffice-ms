@@ -1,6 +1,8 @@
 import { BadRequestException, HttpException, HttpStatus, Inject, Injectable } from "@nestjs/common";
+import { UpdateQuery } from "mongoose";
 import { RequestModel } from "src/features/admin/infrastructure/service/middleware/admin.middleware";
 import { UpdateTokenDto } from "../../infrastructure/dtos/update-token.dto";
+import { TokenModel } from "../../infrastructure/models/token.model";
 import { ITokenRepository } from "../../infrastructure/repositories/token-repository.interface";
 import { TokenTypes } from "../../token.types";
 import { IUpdateTokenApplication } from "./update-token-app.interface";
@@ -15,35 +17,28 @@ export class UpdateTokenApplication implements IUpdateTokenApplication {
   public async execute(id: string, updateTokenDto: UpdateTokenDto, req: RequestModel) {
     const { shortName, symbol } = updateTokenDto;
     const { clientId } = req.admin;
-    const validateUniqueValues = ( shortName || symbol ) 
-      ? await this.validateUniqueValuesByClientId(clientId, updateTokenDto)
-      : null;
-    if (validateUniqueValues) throw new BadRequestException(validateUniqueValues)
-    
-    try {
-      return this.tokenRepository.update(id, updateTokenDto)
-    } catch (error) {
-      throw new HttpException(error, error.status || HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-  }
-  
-  private async validateUniqueValuesByClientId(clientId: string, updateTokenDto: UpdateTokenDto): Promise<string[]> {
-    const { shortName, symbol } = updateTokenDto;
     let errorMessage: string[] = [];
     
     try {
-      const tokens = await this.tokenRepository.findAll({ clientId });
-      if(symbol) {
-        const symbolExsit = tokens.filter(token => token.symbol === symbol).length > 0; 
-        if (symbolExsit) errorMessage.push('symbol already exists.');
-      }
-      if (shortName) {
-        const shortNameExsit = tokens.filter(token => token.shortName === shortName).length > 0; 
-        if (shortNameExsit) errorMessage.push('shortName already exists.');
-      }
-      return (errorMessage.length > 0) ? errorMessage : null;
+      // Verifica que no exista un token del mismo cliente con igual shorname o symbol 
+      const token = await this.tokenRepository.findOne(
+        { $and: [ { clientId }, { $or: [ { shortName }, { symbol } ] } ] }
+      );
+      if (shortName && token?.shortName === shortName) errorMessage.push('El symbol ya se ecuentra en uso.');
+      if (symbol && token?.symbol === symbol) errorMessage.push('El shorName ya se ecuentra en uso');
+      if (errorMessage.length) throw new BadRequestException(errorMessage) 
+
+      const updateToken = await this.tokenRepository.update(
+        { $and: [ { _id: id }, { clientId } ] }, 
+        updateTokenDto as UpdateQuery<TokenModel>,
+        [ { path: 'applicabilities' }, { path: 'operations' }]
+      )
+      if (!updateToken) throw new BadRequestException('El token no existe');
+      
+      return updateToken;
+
     } catch (error) {
-      throw new HttpException(error, HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(error, error.status || HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 }

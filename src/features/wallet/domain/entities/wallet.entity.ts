@@ -34,6 +34,9 @@ export class Wallet {
   }
 
   static toEntity(model: WalletModel): Wallet | string {
+
+    if(!model) return null;
+
     const { address, privateKey, _id, balances } = model;
 
     const isString = typeof model === 'string';

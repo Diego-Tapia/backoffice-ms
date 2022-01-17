@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 import { ApplicabilityModel } from 'src/features/applicability/infrastructure/models/applicability.model';
 import { ClientModel } from 'src/features/client/infrastructure/models/client.model';
-import { TransactionTypeModel } from 'src/features/transaction_type/infrastructure/models/transaction-type.model';
+import { TransactionTypeModel } from 'src/features/transaction/infrastructure/models/transaction-type.model';
 import { ETokenStatus } from '../../domain/enums/token-status.enum';
 
 @Schema({
@@ -28,10 +28,10 @@ export class TokenModel extends Document {
   bcItemId: number;
 
   @Prop({ type: [{ type: Types.ObjectId, ref: ApplicabilityModel.name }] })
-  applicabilities: Types.ObjectId[];
+  applicabilities: Types.ObjectId[] | ApplicabilityModel[];
 
   @Prop({ type: [{ type: Types.ObjectId, ref: TransactionTypeModel.name }] })
-  operations: Types.ObjectId[];
+  operations: Types.ObjectId[] | TransactionTypeModel[];
 
   @Prop()
   description?: string;
@@ -43,7 +43,7 @@ export class TokenModel extends Document {
   validTo?: Date;
 
   @Prop({ type: Types.ObjectId, ref: ClientModel.name })
-  clientId: Types.ObjectId;
+  clientId: Types.ObjectId | ClientModel;
 
   @Prop({ required: true, default: false })
   emited: boolean;

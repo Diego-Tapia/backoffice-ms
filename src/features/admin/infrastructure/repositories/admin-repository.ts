@@ -1,4 +1,4 @@
-import { Inject, Injectable } from "@nestjs/common";
+import { Inject, Injectable, Logger } from "@nestjs/common";
 import { ConfigType } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 import { InjectModel } from "@nestjs/mongoose";
@@ -120,7 +120,7 @@ export class AdminRepository implements IAdminRepository {
 
   public async findById(id: string): Promise<Admin> {
     const adminModel = await this.adminModel.findById(id).exec();
-    return this.toDomainEntity(adminModel);
+    return adminModel ? this.toDomainEntity(adminModel) : null;
   }
 
   public async create(admin: Admin): Promise<Admin> {
